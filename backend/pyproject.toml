@@ -1,0 +1,26 @@
+[project]
+name = "sost-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "fastapi>=0.163.1",
+    "httpx>=0.28.1",
+    "pillow>=13.0.0",
+    "pydantic>=2.14.3",
+    "pydantic-settings>=2.16.3",
+    "pyjwt>=2.15.1",
+    "pynacl>=1.6.2",
+    "python-multipart>=0.0.33",
+    "qrcode>=8.2",
+    "sqlalchemy>=2.1.8",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]

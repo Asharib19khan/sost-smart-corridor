@@ -1,0 +1,66 @@
+{
+  "signing_seed_b64u": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+  "public_key_b64u": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+  "cases": [
+    {
+      "input": {
+        "b": 2,
+        "a": 1
+      },
+      "canonical": "{\"a\":1,\"b\":2}",
+      "sha256": "43258cff783fe7036d8a43033f830adfc60ec037382473548ac742b888292777",
+      "signature_b64u": "LXKfct1YsDnFfmLdGA8NrYo_6ewvTcKDeJ8u-uCHbkBBY2LC95UGocv8DhE7VGZFL6qBGd00CLOSF7fmIYCtDw"
+    },
+    {
+      "input": {
+        "z": {
+          "y": [
+            3,
+            2,
+            {
+              "k": "v"
+            }
+          ],
+          "x": null
+        },
+        "é": true,
+        "a": false
+      },
+      "canonical": "{\"a\":false,\"z\":{\"x\":null,\"y\":[3,2,{\"k\":\"v\"}]},\"é\":true}",
+      "sha256": "dc0961b49bdcffc6fe151d2184d02bc2705d72e457d5ea796f45289a246f1b8d",
+      "signature_b64u": "p4vcIr1Ghl0EnFs57Vb_lN5y_TRXfO46XpTj_hWnDkufzgCTSeOR6eb4uqd67bhaz3LRQNsgDqG2c_9ppQ-QAA"
+    },
+    {
+      "input": {
+        "item_zh": "女士手提包",
+        "item_ur": "خواتین کا ہینڈ بیگ",
+        "qty": 120,
+        "unit_price_fen": 3550
+      },
+      "canonical": "{\"item_ur\":\"خواتین کا ہینڈ بیگ\",\"item_zh\":\"女士手提包\",\"qty\":120,\"unit_price_fen\":3550}",
+      "sha256": "545b8990fab93885044ba88029db74db67548900092c3f61e1d84c45826ce6cd",
+      "signature_b64u": "q0jGjrgSurDGEjYZ5HfErhiyZJbLACSvCKchlOHU5xKmPKvDYbB67quC9-z5dISchn5DHs3h4JClEYcC_u8vCA"
+    },
+    {
+      "input": {
+        "emoji": "😀",
+        "é": 1,
+        "€": 2,
+        "דּ": 3
+      },
+      "canonical": "{\"emoji\":\"😀\",\"é\":1,\"€\":2,\"דּ\":3}",
+      "sha256": "cf2c6b183f4c6e2e5498d9d03fa96804436af336ea2029ef3b3b8277c44e410f",
+      "signature_b64u": "2lSd0vuFqz5Am66zau4brrj2pDakMDqrw2tcd3EIvttcZ6YuCya09FPObwbiHS3P-rCWVe3y-ja73sTt9kUXBA"
+    },
+    {
+      "input": {
+        "neg": -42,
+        "big": 9007199254740991,
+        "s": "quote\" back\\ nl\n tab\t ctl\u0001"
+      },
+      "canonical": "{\"big\":9007199254740991,\"neg\":-42,\"s\":\"quote\\\" back\\\\ nl\\n tab\\t ctl\\u0001\"}",
+      "sha256": "80cfb0fbee82aed3f4577095f29deb1b3bd9214ef871bc4aec3fcd85452fded5",
+      "signature_b64u": "rtR9faOP2NYPVOfA4WofiD_RGNFRGnxihXjrR7K16aA1hV9Eu9QBN8IjiB9Giuca97AmGHnQHjA1n0XYm4M5BA"
+    }
+  ]
+}
