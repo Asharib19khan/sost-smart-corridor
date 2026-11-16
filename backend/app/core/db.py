@@ -259,7 +259,9 @@ class ValueBand(Base):
 
 
 connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-engine = create_engine(settings.database_url, connect_args=connect_args, pool_pre_ping=True)
+# No pre-ping: it costs a full round trip on every request to a remote database. Recycling
+# connections every 4 minutes keeps them from going stale behind the pooler.
+engine = create_engine(settings.database_url, connect_args=connect_args, pool_recycle=240)
 SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
 

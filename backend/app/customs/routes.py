@@ -2,11 +2,13 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..core.db import CustomsDecision, Event, Shipment, User, get_db
+from ..core.db import CustomsDecision, Event, ManifestLine, Shipment, User, get_db
 from ..core.deps import audit, require_role
+from ..integrity.manifest import compare_to_sealed
+from ..integrity.service import prime_chains, verify_chain
 from ..shipments import service as svc
 from ..shipments.state import transition
 
@@ -30,13 +32,25 @@ def _arrived_at(db: Session, sh: Shipment) -> str | None:
 
 @router.get("/customs/queue")
 def queue(_: User = Depends(require_role("customs", "admin")), db: Session = Depends(get_db)) -> list[dict]:
+    ships = list(db.scalars(select(Shipment).where(Shipment.state != "draft")))
+    ids = [sh.id for sh in ships]
+    events = prime_chains(db, ids)  # every chain verified from one events query
+    traders = {u.id: u for u in db.scalars(select(User).where(User.id.in_({sh.trader_id for sh in ships})))}
+    totals = dict(db.execute(select(ManifestLine.shipment_id, func.coalesce(func.sum(ManifestLine.total_fen), 0))
+                             .where(ManifestLine.shipment_id.in_(ids)).group_by(ManifestLine.shipment_id)).all())
     rows = []
-    for sh in db.scalars(select(Shipment).where(Shipment.state != "draft")):
-        trader = db.get(User, sh.trader_id)
+    for sh in ships:
+        evs = events.get(sh.id, [])
+        sealed = next((e for e in reversed(evs) if e.type == "manifest_sealed"), None)
+        payload = (sealed.envelope or {}).get("payload") if sealed else None  # same rule as svc.integrity
+        problems = compare_to_sealed(db, sh, payload) if payload else []
+        last_cp = next((e for e in reversed(evs) if e.type == "checkpoint"), None)
+        arrived = last_cp.created_at.isoformat() if last_cp and (last_cp.payload or {}).get("checkpoint") == "sost"             else None
+        trader = traders.get(sh.trader_id)
         rows.append({"id": sh.id, "ref": sh.ref, "state": sh.state,
                      "trader": {"id": sh.trader_id, "name": trader.name if trader else None},
-                     "risk": svc.risk_out(sh), "integrity_ok": svc.integrity(db, sh)["ok"],
-                     "arrived_at": _arrived_at(db, sh), "total_fen": svc.total_fen(db, sh)})
+                     "risk": svc.risk_out(sh), "integrity_ok": verify_chain(db, sh.id)["ok"] and not problems,
+                     "arrived_at": arrived, "total_fen": int(totals.get(sh.id, 0))})
     rows.sort(key=lambda r: (r["risk"]["score"] is None, -(r["risk"]["score"] or 0)))
     return rows
 

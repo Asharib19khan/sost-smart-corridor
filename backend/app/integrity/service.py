@@ -21,12 +21,14 @@ Envelope (v1), identical for browser-signed events and the future IoT e-seal:
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+import copy
+
+from sqlalchemy import event, select
 from sqlalchemy.orm import Session
 
 from ..core.canonical import canonical_hash
 from ..core.crypto import server_key, sign_with, verify
-from ..core.db import DeviceKey, Event, Shipment
+from ..core.db import DeviceKey, Event, Shipment, User
 
 GENESIS = "0" * 64
 
@@ -117,13 +119,27 @@ class StepResult:
     problem: str | None  # plain-language reason when not ok
 
 
-def verify_chain(db: Session, shipment_id: str) -> dict:
+def preload_signers(db: Session, events: list[Event]) -> None:
+    """Load every signer key and its owner in two queries, so later db.get() calls hit the session cache
+    instead of making one round trip per event (each costs ~0.3 s against a remote Postgres)."""
+    key_ids = {e.signer_key_id for e in events if e.signer_key_id}
+    keep = db.info.setdefault("preloaded", [])  # the identity map holds weak refs: keep the rows alive
+    key_ids -= {k.id for k in keep if isinstance(k, DeviceKey)}
+    keys = list(db.scalars(select(DeviceKey).where(DeviceKey.id.in_(key_ids)))) if key_ids else []
+    user_ids = {k.user_id for k in keys if k.user_id} - {u.id for u in keep if isinstance(u, User)}
+    users = list(db.scalars(select(User).where(User.id.in_(user_ids)))) if user_ids else []
+    keep.extend(keys + users)
+
+
+def _verify_chain(db: Session, shipment_id: str, events: list[Event] | None = None) -> dict:
     """Recompute every hash/signature from stored envelopes.
 
     Also checks that the denormalised columns (payload, type) still match the signed envelope,
     so a DB edit of either is caught. Returns {ok, broken_at, steps:[...]}.
     """
-    events = list(db.scalars(select(Event).where(Event.shipment_id == shipment_id).order_by(Event.seq)))
+    if events is None:
+        events = list(db.scalars(select(Event).where(Event.shipment_id == shipment_id).order_by(Event.seq)))
+    preload_signers(db, events)
     steps: list[StepResult] = []
     prev = GENESIS
     broken_at: int | None = None
@@ -157,3 +173,40 @@ def verify_chain(db: Session, shipment_id: str) -> dict:
         "head_hash": prev,
         "steps": [s.__dict__ for s in steps],
     }
+
+
+# One request often verifies the same chain several times (detail, steps, integrity, risk). Each pass
+# re-reads the events, which is slow against a remote database, so memoise per session and forget the
+# result on ANY write: ORM flushes and raw SQL (the tamper lab bypasses the ORM on purpose).
+_MEMO = "verify_chain_memo"
+
+
+def verify_chain(db: Session, shipment_id: str) -> dict:
+    memo = db.info.setdefault(_MEMO, {})
+    if shipment_id not in memo:
+        memo[shipment_id] = _verify_chain(db, shipment_id)
+    return copy.deepcopy(memo[shipment_id])
+
+
+def prime_chains(db: Session, shipment_ids: list[str]) -> dict[str, list[Event]]:
+    """Verify many chains with one events query (for list screens). Returns each shipment's events by seq."""
+    by_ship: dict[str, list[Event]] = {sid: [] for sid in shipment_ids}
+    if shipment_ids:
+        for ev in db.scalars(select(Event).where(Event.shipment_id.in_(shipment_ids)).order_by(Event.seq)):
+            by_ship[ev.shipment_id].append(ev)
+    preload_signers(db, [e for evs in by_ship.values() for e in evs])
+    memo = db.info.setdefault(_MEMO, {})
+    for sid, evs in by_ship.items():
+        memo[sid] = _verify_chain(db, sid, evs)
+    return by_ship
+
+
+@event.listens_for(Session, "after_flush")
+def _forget_on_flush(session, _ctx) -> None:
+    session.info.pop(_MEMO, None)
+
+
+@event.listens_for(Session, "do_orm_execute")
+def _forget_on_write(state) -> None:
+    if not state.is_select:
+        state.session.info.pop(_MEMO, None)
