@@ -1,3 +1,4 @@
+import secrets
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,7 +10,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", env_prefix="SOST_", extra="ignore")
 
     database_url: str = f"sqlite:///{(BACKEND_DIR / 'data' / 'sost.db').as_posix()}"
-    jwt_secret: str = "dev-only-change-me-dev-only-change-me"
+    # Empty means: use (or create) a random secret in data/jwt_secret. Never ship a fixed default:
+    # the repo is public, and anyone who knows the secret can mint an admin token.
+    jwt_secret: str = ""
     jwt_access_minutes: int = 15
     jwt_refresh_days: int = 7
     # Server Ed25519 key (base64 seed) for chain-head and timestamp counter-signatures.
@@ -25,6 +28,23 @@ class Settings(BaseSettings):
     # Demo FX rate CNY->PKR, labelled on screen as fixed sandbox rate.
     fx_cny_pkr: float = 39.0
     dev_show_otp: bool = True
+    # Showcase features: the admin Tamper lab (raw database edits) and the demo-account list on sign-in.
+    # Turn off for any real deployment.
+    demo_mode: bool = True
+
+
+def _jwt_secret(configured: str) -> str:
+    weak = {"", "dev-only-change-me-dev-only-change-me", "change-me", "secret"}
+    if configured not in weak:
+        if len(configured) < 32:
+            raise RuntimeError("SOST_JWT_SECRET must be at least 32 characters.")
+        return configured
+    path = BACKEND_DIR / "data" / "jwt_secret"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.write_text(secrets.token_urlsafe(48))
+    return path.read_text().strip()
 
 
 settings = Settings()
+settings.jwt_secret = _jwt_secret(settings.jwt_secret)

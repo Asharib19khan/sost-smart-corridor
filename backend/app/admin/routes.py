@@ -14,6 +14,7 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from ..core.config import settings
 from ..core.db import AuditLog, DeviceKey, Shipment, User, get_db
 from ..core.deps import audit, require_role
 from ..keys.routes import key_out, revoke_key
@@ -21,6 +22,12 @@ from .models import TamperSnapshot
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 admin_only = require_role("admin")
+
+
+def demo_only() -> None:
+    """The Tamper lab writes raw SQL on purpose. It exists for demonstrations and is off in real deployments."""
+    if not settings.demo_mode:
+        raise HTTPException(404, "Not found.")
 
 
 @router.get("/audit")
@@ -93,7 +100,7 @@ def _check(rowcount: int, what: str) -> None:
         raise HTTPException(404, f"Nothing to tamper: {what} not found on this shipment.")
 
 
-@router.post("/tamper")
+@router.post("/tamper", dependencies=[Depends(demo_only)])
 def tamper(body: TamperIn, request: Request, user: User = Depends(admin_only),
            db: Session = Depends(get_db)) -> dict:
     sid = body.shipment_id
@@ -162,7 +169,7 @@ def _upsert(db: Session, table: str, rows: list[dict]) -> None:
                             f"VALUES ({', '.join(':' + c for c in cols)})"), r)
 
 
-@router.post("/tamper/restore")
+@router.post("/tamper/restore", dependencies=[Depends(demo_only)])
 def restore(body: RestoreIn, request: Request, user: User = Depends(admin_only),
             db: Session = Depends(get_db)) -> dict:
     snap = db.get(TamperSnapshot, body.shipment_id)

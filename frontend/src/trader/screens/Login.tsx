@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { api, setSession, type Session } from '../../shared/api'
 import { ensureKey, reRegister } from '../lib/device'
 import { homeFor } from '../lib/session'
-import { Button, ErrorBox, Field, Mono, Notice, PinPad, Shell, errText } from '../lib/ui'
+import { Button, ErrorBox, Field, Mono, Notice, PinPad, Shell, errText, useLoad } from '../lib/ui'
 
 const DEMO = [
   { name: 'Karim Baig', role: 'trader', phone: '+923001110001', pin: '1111' },
@@ -60,6 +60,7 @@ function KeyTrouble({ message, onAgain, busy }: { message: string; onAgain: () =
 function PinLogin() {
   const { t } = useTranslation()
   const [phone, setPhone] = useState('')
+  const demo = useLoad(() => api<{ demo?: boolean }>('/health', { auth: false }), []).data?.demo ?? false
   const [pin, setPin] = useState('')
   const [err, setErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -87,7 +88,7 @@ function PinLogin() {
       {f.keyError && f.pending && <KeyTrouble message={f.keyError} busy={f.busy} onAgain={() => void f.finish(f.pending!, true)} />}
       <div className="mt-6"><Button busy={busy || f.busy} disabled={!phone || pin.length < 4} onClick={() => void submit()}>{t('trader.login.signIn')}</Button></div>
 
-      <section className="mt-10">
+      {demo && <section className="mt-10">
         <h2 className="text-sm font-semibold">{t('trader.login.demo')}</h2>
         <p className="mb-2 text-sm text-muted">{t('trader.login.demoNote')}</p>
         <ul className="border-t border-line">
@@ -100,7 +101,7 @@ function PinLogin() {
             </li>
           ))}
         </ul>
-      </section>
+      </section>}
     </>
   )
 }

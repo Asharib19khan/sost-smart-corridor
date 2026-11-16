@@ -337,6 +337,12 @@ slower than local SQLite. Use the *session pooler*, not the direct host (direct 
 To wipe Supabase back to fresh demo data (deletes everything in it): `.\dev.ps1 -Seed`, or
 `cd backend; uv run python scripts/reset_db.py --yes`. Without `--yes` it only prints which database it would wipe.
 
+### Before a real deployment
+
+- `SOST_DEMO_MODE=false` turns off the Tamper lab (raw database edits) and the demo-account list on sign-in.
+- The login-token secret is generated on first start into `backend/data/jwt_secret` (git-ignored). On a server,
+  set `SOST_JWT_SECRET` (32+ random characters) instead; a short or default value is refused.
+
 ### Check it
 
 ```powershell

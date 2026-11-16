@@ -57,4 +57,4 @@ for name in MODULES:
 
 @app.get("/health")
 def health() -> dict:
-    return {"ok": True, "server_public_key": server_public_key()}
+    return {"ok": True, "server_public_key": server_public_key(), "demo": settings.demo_mode}
