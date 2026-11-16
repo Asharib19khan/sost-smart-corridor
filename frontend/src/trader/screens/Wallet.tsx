@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { api } from '../../shared/api'
+import { api, downloadJson } from '../../shared/api'
 import { fen, paisa } from '../lib/money'
 import { useSession } from '../lib/session'
 import { Button, ErrorBox, Loading, Notice, Row, Shell, errText, useLoad } from '../lib/ui'
@@ -95,6 +95,7 @@ export function DutyScreen() {
           <div className="flex items-baseline justify-between py-4 text-lg font-semibold"><span>{t('trader.duty.total')}</span><span dir="ltr">{paisa(d.data.total_paisa)}</span></div>
           {done ? <Notice tone="ok" title={t('trader.duty.paid')} /> : <Button busy={busy} onClick={() => void pay()}>{t('trader.duty.pay')}</Button>}
           {err && <ErrorBox message={err} />}
+          <Button kind="quiet" className="mt-4" onClick={() => void api(`/shipments/${id}/declaration`).then((gd) => downloadJson(`GD-${(gd as { shipment_ref?: string }).shipment_ref ?? id}.json`, gd)).catch((e) => setErr(errText(e)))}>{t('trader.duty.gd')}</Button>
         </>
       )}
     </Shell>

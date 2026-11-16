@@ -4,7 +4,7 @@ const en = {
   back: 'Back', risk: 'Risk',
   home: { hello: 'Welcome', new: 'Start a new shipment', mine: 'My shipments', assigned: 'Assigned shipments', empty: 'No shipments yet. Start one when you have a receipt from Kashgar.', emptyDriver: 'No shipments assigned to you yet.', wallet: 'Wallet', logout: 'Sign out' },
   hub: {
-    title: 'Shipment', next: 'Next step',
+    officerSaid: 'The officer wrote:', title: 'Shipment', next: 'Next step',
     do: { scan: 'Scan a receipt', review: 'Check the items', pay: 'Pay the seller', seal: 'Seal the shipment', track: 'Record a checkpoint' },
     end: { cleared: 'Cleared by customs. Nothing more to do.', held: 'Customs is holding this shipment. Check the reason with the officer.', arrived_sost: 'At Sost. Waiting for customs.', other: 'No further step for you right now.' },
     receipts: 'Receipts', lines: 'Items', total: 'Total',
@@ -20,14 +20,14 @@ const en = {
   seal: { copy: 'Copy verify link', copied: 'Link copied', title: 'Seal the shipment',hash: 'Manifest fingerprint', intro: 'Sealing signs this exact list with your phone key. Any later change to any line will be detected.', cta: 'Seal with my key', done: 'Sealed', doneNote: 'Show this code at Sost. Anyone can check it, even without signal.', qrAlt: 'Seal QR code', notReady: 'Not ready to seal', notReadyNote: 'Pay the seller first.' },
   track: { title: 'Checkpoints', intro: 'Tap at each checkpoint. Your phone adds its real GPS location and signs it.', at: { kashgar: 'Left Kashgar', khunjerab: 'Crossed Khunjerab', sost: 'Arrived at Sost' }, noGps: 'Could not get your location. Allow location access, or tick the demo location.', sent: 'Checkpoint recorded.', queued: 'No signal. Saved on this phone and will be sent when you are online.', demoLoc: 'Use demo location (for presentations only)', demoNote: 'Demo location: coordinates are not from your GPS.', waiting: '{{n}} checkpoint(s) waiting to send', sendNow: 'Send now', discard: 'Discard first', log: 'Checkpoint log', none: 'No checkpoints yet.', outside: 'Outside the expected area — customs will see this.' },
   wallet: { title: 'Wallet', credit: 'Credit limit', addCny: 'Add ¥50,000 (sandbox)', addPkr: 'Add Rs 500,000 (sandbox)', trust: 'Trust score {{score}}', history: 'History', none: 'No transactions yet.' },
-  duty: { on: 'value {{value}}', split: 'duty {{duty}} ({{dp}}%) + sales tax {{tax}} ({{tp}}%)', title: 'Duty and tax',indicative: 'Indicative estimate', total: 'Total payable', pay: 'Pay duty (sandbox)', paid: 'Duty paid.' },
+  duty: { gd: 'Download goods declaration', on: 'value {{value}}',split: 'duty {{duty}} ({{dp}}%) + sales tax {{tax}} ({{tp}}%)', title: 'Duty and tax',indicative: 'Indicative estimate', total: 'Total payable', pay: 'Pay duty (sandbox)', paid: 'Duty paid.' },
 }
 const ur: typeof en = {
   role: { trader: 'تاجر', driver: 'ڈرائیور', customs: 'کسٹمز افسر', admin: 'ایڈمن' },
   back: 'واپس', risk: 'خطرہ',
   home: { hello: 'خوش آمدید', new: 'نئی کھیپ شروع کریں', mine: 'میری کھیپیں', assigned: 'آپ کو سونپی گئی کھیپیں', empty: 'ابھی کوئی کھیپ نہیں۔ کاشغر کی رسید ہو تو شروع کریں۔', emptyDriver: 'ابھی آپ کو کوئی کھیپ نہیں سونپی گئی۔', wallet: 'والیٹ', logout: 'سائن آؤٹ' },
   hub: {
-    title: 'کھیپ', next: 'اگلا قدم',
+    officerSaid: 'افسر نے لکھا:', title: 'کھیپ', next:'اگلا قدم',
     do: { scan: 'رسید اسکین کریں', review: 'اشیاء چیک کریں', pay: 'بیچنے والے کو ادائیگی کریں', seal: 'کھیپ پر مہر لگائیں', track: 'چیک پوائنٹ درج کریں' },
     end: { cleared: 'کسٹمز نے کلیئر کر دیا۔ مزید کچھ نہیں کرنا۔', held: 'کسٹمز نے کھیپ روک رکھی ہے۔ وجہ افسر سے پوچھیں۔', arrived_sost: 'سوست میں ہے۔ کسٹمز کا انتظار ہے۔', other: 'ابھی آپ کے لیے کوئی اگلا قدم نہیں۔' },
     receipts: 'رسیدیں', lines: 'اشیاء', total: 'کل',
@@ -43,14 +43,14 @@ const ur: typeof en = {
   seal: { copy: 'تصدیق کا لنک کاپی کریں', copied: 'لنک کاپی ہو گیا', title: 'کھیپ پر مہر',hash: 'مینی فیسٹ کا فنگر پرنٹ', intro: 'مہر لگانے سے یہی فہرست آپ کے فون کی کلید سے دستخط ہو جاتی ہے۔ بعد میں کسی بھی لائن کی تبدیلی پکڑی جائے گی۔', cta: 'اپنی کلید سے مہر لگائیں', done: 'مہر بند', doneNote: 'یہ کوڈ سوست میں دکھائیں۔ کوئی بھی اسے جانچ سکتا ہے، سگنل کے بغیر بھی۔', qrAlt: 'مہر کا کیو آر کوڈ', notReady: 'مہر کے لیے تیار نہیں', notReadyNote: 'پہلے بیچنے والے کو ادائیگی کریں۔' },
   track: { title: 'چیک پوائنٹ', intro: 'ہر چیک پوائنٹ پر ٹیپ کریں۔ آپ کا فون اصل جی پی ایس مقام شامل کر کے دستخط کرتا ہے۔', at: { kashgar: 'کاشغر سے روانہ', khunjerab: 'خنجراب پار', sost: 'سوست پہنچ گئے' }, noGps: 'آپ کا مقام نہیں مل سکا۔ مقام کی اجازت دیں یا ڈیمو مقام منتخب کریں۔', sent: 'چیک پوائنٹ درج ہو گیا۔', queued: 'سگنل نہیں۔ اس فون میں محفوظ ہے اور آن لائن ہوتے ہی بھیج دیا جائے گا۔', demoLoc: 'ڈیمو مقام استعمال کریں (صرف پیشکش کے لیے)', demoNote: 'ڈیمو مقام: یہ نقاط آپ کے جی پی ایس کے نہیں۔', waiting: '{{n}} چیک پوائنٹ بھیجنے کے منتظر', sendNow: 'ابھی بھیجیں', discard: 'پہلا حذف کریں', log: 'چیک پوائنٹ لاگ', none: 'ابھی کوئی چیک پوائنٹ نہیں۔', outside: 'متوقع علاقے سے باہر — کسٹمز کو یہ نظر آئے گا۔' },
   wallet: { title: 'والیٹ', credit: 'کریڈٹ کی حد', addCny: '¥50,000 ڈالیں (سینڈ باکس)', addPkr: 'Rs 500,000 ڈالیں (سینڈ باکس)', trust: 'اعتماد اسکور {{score}}', history: 'تاریخ', none: 'ابھی کوئی لین دین نہیں۔' },
-  duty: { on: 'مالیت {{value}}', split: 'ڈیوٹی {{duty}} ({{dp}}%) + سیلز ٹیکس {{tax}} ({{tp}}%)', title: 'ڈیوٹی اور ٹیکس',indicative: 'اندازاً تخمینہ', total: 'کل واجب الادا', pay: 'ڈیوٹی ادا کریں (سینڈ باکس)', paid: 'ڈیوٹی ادا ہو گئی۔' },
+  duty: { gd: 'گڈز ڈیکلریشن ڈاؤن لوڈ کریں', on: 'مالیت {{value}}',split: 'ڈیوٹی {{duty}} ({{dp}}%) + سیلز ٹیکس {{tax}} ({{tp}}%)', title: 'ڈیوٹی اور ٹیکس',indicative: 'اندازاً تخمینہ', total: 'کل واجب الادا', pay: 'ڈیوٹی ادا کریں (سینڈ باکس)', paid: 'ڈیوٹی ادا ہو گئی۔' },
 }
 const zh: typeof en = {
   role: { trader: '商人', driver: '司机', customs: '海关官员', admin: '管理员' },
   back: '返回', risk: '风险',
   home: { hello: '欢迎', new: '开始新货运', mine: '我的货运', assigned: '分配给我的货运', empty: '还没有货运。拿到喀什的收据后开始。', emptyDriver: '还没有分配给你的货运。', wallet: '钱包', logout: '退出' },
   hub: {
-    title: '货运', next: '下一步',
+    officerSaid: '海关官员写道：', title: '货运', next: '下一步',
     do: { scan: '扫描收据', review: '核对货品', pay: '向卖家付款', seal: '封签货运', track: '记录检查点' },
     end: { cleared: '海关已放行，无需操作。', held: '海关扣留了此货运，请向官员询问原因。', arrived_sost: '已到苏斯特，等待海关。', other: '目前你没有后续步骤。' },
     receipts: '收据', lines: '货品', total: '合计',
@@ -66,6 +66,6 @@ const zh: typeof en = {
   seal: { copy: '复制验证链接', copied: '链接已复制', title: '封签货运',hash: '货单指纹', intro: '封签会用你手机的密钥为这份清单签名。之后任何一行被改动都会被发现。', cta: '用我的密钥封签', done: '已封签', doneNote: '在苏斯特出示此码。任何人都能验证，无信号也可以。', qrAlt: '封签二维码', notReady: '尚不能封签', notReadyNote: '请先向卖家付款。' },
   track: { title: '检查点', intro: '在每个检查点点按。手机会加上真实 GPS 位置并签名。', at: { kashgar: '已离开喀什', khunjerab: '已过红其拉甫', sost: '已到苏斯特' }, noGps: '无法获取位置。请允许定位，或勾选演示位置。', sent: '检查点已记录。', queued: '没有信号。已保存在手机，联网后自动发送。', demoLoc: '使用演示位置（仅用于演示）', demoNote: '演示位置：这些坐标不是你的 GPS。', waiting: '{{n}} 个检查点等待发送', sendNow: '立即发送', discard: '丢弃第一条', log: '检查点记录', none: '还没有检查点。', outside: '不在预期区域内——海关将看到此标记。' },
   wallet: { title: '钱包', credit: '信用额度', addCny: '充值 ¥50,000（沙盒）', addPkr: '充值 Rs 500,000（沙盒）', trust: '信任分 {{score}}', history: '记录', none: '暂无交易。' },
-  duty: { on: '货值 {{value}}', split: '关税 {{duty}}（{{dp}}%）+ 销售税 {{tax}}（{{tp}}%）', title: '关税与税费',indicative: '参考估算', total: '应缴合计', pay: '缴纳关税（沙盒）', paid: '关税已缴。' },
+  duty: { gd: '下载货物申报单', on: '货值 {{value}}',split: '关税 {{duty}}（{{dp}}%）+ 销售税 {{tax}}（{{tp}}%）', title: '关税与税费',indicative: '参考估算', total: '应缴合计', pay: '缴纳关税（沙盒）', paid: '关税已缴。' },
 }
 export const traderLocales = { en: { trader: en }, ur: { trader: ur }, zh: { trader: zh } }

@@ -95,3 +95,11 @@ export async function api<T = unknown>(
   }
   return (r.status === 204 ? undefined : await r.json()) as T
 }
+
+/** Save a JSON document as a file (used for the goods declaration export). */
+export function downloadJson(filename: string, data: unknown): void {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename })
+  document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
+}

@@ -25,6 +25,7 @@ export default function Hub() {
   const q = useLoad(() => api<ShipmentDetail>(`/shipments/${id}`), [id])
   const s = q.data
   const act = s && nextAction(s)
+  const lastDecision = s?.decisions?.[s.decisions.length - 1]
 
   return (
     <Shell back="/t" title={s ? <span className="font-mono" dir="ltr">{s.ref}</span> : t('trader.hub.title')}>
@@ -40,7 +41,9 @@ export default function Hub() {
               <LinkButton to={act.to}>{t(`trader.hub.do.${act.key}`)}</LinkButton>
             </>
           ) : (
-            <Notice tone={s.state === 'held' ? 'bad' : s.state === 'cleared' ? 'ok' : 'info'} title={t(`trader.hub.end.${s.state}`, { defaultValue: t('trader.hub.end.other') })} />
+            <Notice tone={s.state === 'held' ? 'bad' : s.state === 'cleared' ? 'ok' : 'info'} title={t(`trader.hub.end.${s.state}`, { defaultValue: t('trader.hub.end.other') })}>
+              {lastDecision?.reason ? <p>{t('trader.hub.officerSaid')} <q>{lastDecision.reason}</q></p> : null}
+            </Notice>
           )}
           <div className="mt-10">
             <Row label={t('trader.hub.receipts')}>{s.receipts.length}</Row>

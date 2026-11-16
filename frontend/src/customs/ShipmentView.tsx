@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router-dom'
-import { api, API_BASE, getSession } from '../shared/api'
+import { api, API_BASE, downloadJson, getSession } from '../shared/api'
 import { fen, paisa, when, lag, lagSeconds } from './lib/format'
 import { checkStep, type LocalCheck } from './lib/stepCheck'
 import type { Duty, Line, ShipmentDetail, Step, VerifyReport } from './lib/types'
@@ -75,6 +75,7 @@ export default function ShipmentView() {
             {duty.error ? <ErrorBox message={duty.error} onRetry={() => void duty.reload()} /> : null}
             {!duty.data && duty.loading ? <Loading /> : null}
             {duty.data ? <DutyTable d={duty.data} /> : null}
+            {duty.data ? <GdButton id={id} ref_={s.ref} /> : null}
           </Section>
         </aside>
       </div>
@@ -283,6 +284,24 @@ function DutyTable({ d }: { d: Duty }) {
         <tfoot><tr><td colSpan={4} className="text-end text-xs text-muted">{t('customs.ship.dutyTotal')}</td><td className="num font-semibold">{paisa(d.total_paisa)}</td></tr></tfoot>
       </table>
       <p className="px-2 py-1 text-xs text-muted">{t('customs.ship.fx', { rate: String(d.fx_cny_pkr) })}</p>
+    </div>
+  )
+}
+
+function GdButton({ id, ref_ }: { id: string; ref_: string }) {
+  const { t } = useTranslation()
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const get = async () => {
+    setBusy(true); setErr(null)
+    try { downloadJson(`GD-${ref_}.json`, await api(`/shipments/${encodeURIComponent(id)}/declaration`)) }
+    catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
+  }
+  return (
+    <div className="mt-3">
+      <button className="btn" onClick={() => void get()} disabled={busy} aria-busy={busy}>{t('customs.ship.gd')}</button>
+      <p className="mt-1 text-xs text-muted">{t('customs.ship.gdNote')}</p>
+      {err ? <p className="mt-1 text-xs text-bad" role="alert">{err}</p> : null}
     </div>
   )
 }

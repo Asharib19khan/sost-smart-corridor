@@ -5,10 +5,12 @@ from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..core.db import CustomsDecision, Event, ManifestLine, Shipment, User, get_db
+from ..core.db import CustomsDecision, Event, ManifestLine, Payment, Seller, Shipment, User, get_db
+from ..core.deps import current_user
 from ..core.deps import audit, require_role
 from ..integrity.manifest import compare_to_sealed
 from ..integrity.service import prime_chains, verify_chain
+from ..ledger.routes import duty_breakdown
 from ..risk import service as risk_svc
 from ..shipments import service as svc
 from ..shipments.state import transition
@@ -142,3 +144,57 @@ def decide(shipment_id: str, body: DecisionIn, request: Request,
     audit(db, request, user.id, "customs.decision", sh.id, {"decision": decision, "reason": reason, "seq": ev.seq})
     db.commit()
     return {"state": sh.state, "seq": ev.seq, "decision": decision, "trust": trust}
+
+
+@router.get("/shipments/{shipment_id}/declaration")
+def declaration(shipment_id: str, user: User = Depends(current_user), db: Session = Depends(get_db)) -> dict:
+    """Goods Declaration draft in the shape PSW (Pakistan Single Window) asks for, plus the integrity proof
+    that is this system's point: anyone holding the file can re-check it on the public verify page."""
+    sh = svc.load_for(db, shipment_id, user)
+    duty = duty_breakdown(db, sh)
+    trader = db.get(User, sh.trader_id)
+    lines = {ln.line_no: ln for ln in db.scalars(select(ManifestLine).where(ManifestLine.shipment_id == sh.id))}
+    sellers = {p.seller_id for p in db.scalars(select(Payment).where(Payment.shipment_id == sh.id))}
+    exporters = [sl.shop_name_en for sl in db.scalars(select(Seller).where(Seller.id.in_(sellers)))]
+    chain = verify_chain(db, sh.id)
+    sealed = svc.sealed_payload(db, sh)
+    problems = compare_to_sealed(db, sh, sealed) if sealed else []
+    decision = db.scalars(select(CustomsDecision).where(CustomsDecision.shipment_id == sh.id)
+                          .order_by(CustomsDecision.created_at.desc()).limit(1)).first()
+    return {
+        "document": "Goods Declaration (draft for PSW)",
+        "status": "not_submitted",
+        "note": "Prepared from the signed shipment record. Not submitted: no live PSW connection in this prototype.",
+        "declaration_type": "Import - Home Consumption",
+        "collectorate": "Sost (Khunjerab border)",
+        "port_of_entry": "Sost Dry Port",
+        "country_of_origin": "China",
+        "place_of_loading": "Kashgar",
+        "shipment_ref": sh.ref,
+        "importer": {"id": sh.trader_id, "name": trader.name if trader else None},
+        "exporters": exporters,
+        "currency": "PKR",
+        "exchange_rate_cny_pkr": duty["fx_cny_pkr"],
+        "items": [{
+            "item_no": x["line_no"], "hs_code": x["hs_code"], "description": x["item_en"],
+            "description_zh": lines[x["line_no"]].item_zh if x["line_no"] in lines else None,
+            "quantity": lines[x["line_no"]].qty if x["line_no"] in lines else None,
+            "unit": lines[x["line_no"]].unit if x["line_no"] in lines else None,
+            "invoice_value_fen": x["value_fen"], "assessable_value_paisa": x["value_paisa"],
+            "customs_duty_pct": x["duty_pct"], "customs_duty_paisa": x["duty_paisa"],
+            "sales_tax_pct": x["sales_tax_pct"], "sales_tax_paisa": x["sales_tax_paisa"],
+        } for x in duty["lines"]],
+        "assessable_value_paisa": sum(x["value_paisa"] for x in duty["lines"]),
+        "total_duty_and_taxes_paisa": duty["total_paisa"],
+        "rates_note": "Indicative rates from the seeded tariff table, not the live PCT schedule.",
+        "integrity": {
+            "verified": chain["ok"] and not problems,
+            "sealed_manifest_hash": (sealed or {}).get("manifest_hash"),
+            "signed_steps": len(chain["steps"]),
+            "chain_head_hash": chain["head_hash"],
+            "verify_path": f"/v/{sh.id}",
+        },
+        "customs_decision": {"decision": decision.decision, "reason": decision.reason,
+                             "at": decision.created_at.isoformat() if decision.created_at else None}
+                            if decision else None,
+    }

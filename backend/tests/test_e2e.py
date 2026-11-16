@@ -215,6 +215,11 @@ def test_full_story(c):
     assert after["score"] > before and after["reasons"]
     assert c.get("/wallet", headers=karim.h).status_code == 200
     assert c.get(f"/shipments/{sid}/duty", headers=karim.h).json()["total_paisa"] > 0
+    gd = c.get(f"/shipments/{sid}/declaration", headers=officer.h).json()
+    assert gd["customs_decision"]["decision"] == "approve" and gd["items"] and gd["items"][0]["quantity"]
+    assert gd["total_duty_and_taxes_paisa"] > 0 and gd["integrity"]["sealed_manifest_hash"]
+    assert c.get(f"/shipments/{sid}/declaration", headers=karim.h).status_code == 200
+    assert c.get(f"/shipments/{sid}/declaration", headers=nasreen.h).status_code == 403
 
     # 8. Revoked key: old signatures still verify, new ones refused
     assert c.delete(f"/keys/{driver.kid}", headers=driver.h).status_code in (200, 204)
