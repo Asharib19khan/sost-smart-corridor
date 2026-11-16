@@ -10,7 +10,7 @@ Read the receipt. Seal the shipment. Prove nothing changed.
 <br>
 
 [![Backend tests](https://img.shields.io/badge/backend%20tests-10%20passing-1f7a3d?style=for-the-badge)](backend/tests)
-[![Frontend tests](https://img.shields.io/badge/frontend%20tests-9%20passing-1f7a3d?style=for-the-badge)](frontend/src)
+[![Frontend tests](https://img.shields.io/badge/frontend%20tests-11%20passing-1f7a3d?style=for-the-badge)](frontend/src)
 [![Languages](https://img.shields.io/badge/languages-اردو%20·%20English%20·%20中文-0f5f5c?style=for-the-badge)](#-three-languages-two-directions)
 [![Signatures](https://img.shields.io/badge/signatures-Ed25519-0f5f5c?style=for-the-badge)](#-how-the-proof-works)
 [![Status](https://img.shields.io/badge/status-hackathon%20prototype-a86411?style=for-the-badge)](#-honest-limits)
@@ -310,11 +310,35 @@ Open **http://localhost:5173**.
 Sample receipts to upload are in [`demo/receipts/`](demo/receipts) (`r3.png` is a good first one).
 These accounts are demo data only.
 
+### Show it on phones
+
+`dev.ps1` prints a second address, like `http://192.168.x.x:5173`. Phones on the same Wi-Fi can open it, and the seal QR
+codes are printed with that address so a visitor's own phone camera opens the verify page straight from the QR.
+
+Two honest limits of plain `http` on a phone: browsers only allow **GPS and the in-app camera scanner on `https` or
+`localhost`**. So on a phone, tick "demo location" for checkpoints (it is labelled), and scan seals with the phone's
+normal camera app rather than the in-page scanner. Some venue Wi-Fi blocks device-to-device traffic; a phone hotspot
+from your own phone is the reliable fallback.
+
+### Use Supabase instead of the local database
+
+By default the app uses a local SQLite file. To use Postgres (for example Supabase), put the **session pooler** string in
+`backend/.env` (it is gitignored, never commit it):
+
+```
+SOST_DATABASE_URL=postgresql+psycopg://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+```
+
+On first start the app creates the tables, installs the append-only audit trigger, and turns on row-level security with
+no policies, so Supabase's public API key can read nothing. The same end-to-end test runs against it:
+`SOST_E2E_DATABASE_URL=<that url> uv run pytest tests/test_e2e.py`. Over the internet each action is about a second
+slower than local SQLite. Use the *session pooler*, not the direct host (direct is IPv6-only).
+
 ### Check it
 
 ```powershell
 cd backend;  uv run pytest -q                                   # 10 tests, including the full judge story + attacks
-cd frontend; pnpm exec tsc --noEmit -p tsconfig.app.json; pnpm exec vitest run; pnpm build
+cd frontend; pnpm exec tsc --noEmit -p tsconfig.app.json; pnpm exec vitest run; pnpm build           # 11 tests, incl. QR round-trip
 ```
 
 ---
@@ -329,7 +353,7 @@ This is a hackathon prototype, and the screens say so wherever it matters.
 - **Demo location.** The track screen has an opt-in "demo location" tick for presentations. It is labelled, and the
   default is the phone's real GPS.
 - **Duty is indicative.** Rates are from a small seeded table, not the live tariff.
-- **Not yet tested:** camera QR scanning on real devices and the offline queue in a real no-signal journey.
+- **Tested in a browser, not on hardware:** the offline checkpoint queue (browser set offline, then reconnected) and QR decoding (round-trip test). Camera scanning on a physical phone has not been tried.
 - **Single machine.** SQLite and one API process. Moving to Postgres/Supabase is planned, not done.
 
 ## 🗺️ Where it goes next

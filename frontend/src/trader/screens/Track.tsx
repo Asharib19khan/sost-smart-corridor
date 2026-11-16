@@ -56,7 +56,7 @@ export default function Track() {
         await postCheckpoint(q)
         setMsg(t('trader.track.sent'))
       } catch (e) {
-        if (e instanceof ApiError && e.status === 0) { await enqueue(q); setMsg(t('trader.track.queued')) } else throw e
+        if (e instanceof ApiError && e.status === 0) { await enqueue(q); setMsg(t('trader.track.queued')); return } else throw e
       }
       await ship.reload()
     } catch (e) { setErr(errText(e)) } finally { setBusy(null) }
@@ -66,7 +66,7 @@ export default function Track() {
   const next = ship.data?.allowed_next ?? []
   return (
     <Shell back={`/t/s/${id}`} title={t('trader.track.title')}>
-      {ship.loading && !ship.data ? <Loading /> : ship.error ? <ErrorBox message={ship.error} onRetry={ship.reload} /> : (
+      {ship.loading && !ship.data ? <Loading /> : ship.error && !ship.data ? <ErrorBox message={ship.error} onRetry={ship.reload} /> : (
         <>
           <p className="mb-4 text-muted">{t('trader.track.intro')}</p>
           <div className="space-y-3">
