@@ -45,7 +45,7 @@ export default defineConfig({
       manifest: {
         name: 'Sost Smart Corridor',
         short_name: 'Corridor',
-        start_url: '/',
+        start_url: '/t',
         display: 'standalone',
         background_color: '#f4f1ea',
         theme_color: '#f4f1ea',

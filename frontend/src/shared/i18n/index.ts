@@ -5,6 +5,7 @@ import { traderLocales } from '../../trader/locales'
 import { sellerLocales } from '../../seller/locales'
 import { customsLocales } from '../../customs/locales'
 import { serverTextLocales } from '../serverText'
+import { homeLocales } from '../../home/locales'
 import { verifyLocales } from '../../verify/locales'
 import { adminLocales } from '../../admin/locales'
 
@@ -15,7 +16,7 @@ export const LANGS = [
 ] as const
 export type Lang = (typeof LANGS)[number]['code']
 
-const all = [commonLocales, traderLocales, sellerLocales, customsLocales, verifyLocales, adminLocales, serverTextLocales]
+const all = [commonLocales, traderLocales, sellerLocales, customsLocales, verifyLocales, adminLocales, serverTextLocales, homeLocales]
 const resources = Object.fromEntries(
   (['en', 'ur', 'zh'] as const).map((l) => [l, { translation: Object.assign({}, ...all.map((a) => a[l])) }]),
 )

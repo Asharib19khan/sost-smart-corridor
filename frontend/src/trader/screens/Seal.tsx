@@ -52,7 +52,7 @@ export default function Seal() {
           {seal ? (
             <>
               <Notice tone="ok" title={t('trader.seal.done')}>{t('trader.seal.doneNote')}</Notice>
-              {png && <img src={png} alt={t('trader.seal.qrAlt')} width={300} height={300} className="mx-auto my-6 border border-line bg-surface p-2" />}
+              {png && <img src={png} alt={t('trader.seal.qrAlt')} width={300} height={300} className="stamp mx-auto my-6 rounded-md border border-line bg-surface p-2 shadow-[0_14px_30px_-18px_rgb(0_0_0/0.4)]" />}
               {url && (
                 <p className="text-center">
                   <button type="button" className="min-h-11 px-4 text-sm font-semibold text-accent underline"

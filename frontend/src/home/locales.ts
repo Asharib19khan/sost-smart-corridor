@@ -1,0 +1,118 @@
+const en = {
+  title: 'Every shipment over Khunjerab, signed and provable.',
+  lead: 'A trader photographs the Kashgar receipt. The seller confirms it from their phone. The shipment is sealed with a key that never leaves the device, and every checkpoint signs its place. At Sost, the officer sees one answer: nothing changed, or exactly what did.',
+  tryIt: 'Try it',
+  checkSeal: 'Check a seal',
+  demoCaption: 'Live: the sealed manifest is edited behind the app’s back. The check names the line.',
+  demo: {
+    sealed: 'Sealed · 3 lines · all signatures valid',
+    broken: 'Broken at step 3 · line 2 was edited after sealing',
+    restored: 'Restored · verified again',
+    line1: 'Phone fast charger 20W', line2: 'Bluetooth earphones', line3: 'LED strip light 5 m',
+  },
+  journeyTitle: 'One shipment, five signed steps',
+  steps: {
+    scan: ['Scan', 'The Chinese receipt is read, translated to Urdu and English, and matched to HS codes. Odd prices are flagged.'],
+    pay: ['Pay', 'Payment needs the trader’s PIN. The Kashgar seller confirms goods and amount from a link, in Mandarin.'],
+    seal: ['Seal', 'The exact manifest is signed on the phone. A QR seal travels with the paperwork and works offline.'],
+    track: ['Track', 'Kashgar, Khunjerab, Sost: each checkpoint signs its GPS fix, queued offline when there is no signal.'],
+    clear: ['Clear', 'Customs re-checks every signature in its own browser, sees the risk in plain sentences, and signs the decision.'],
+  },
+  rolesTitle: 'Try it as',
+  roles: {
+    trader: ['Trader', 'Scan a receipt, pay, seal and track a shipment on a phone.', 'Karim · +923001110001 · PIN 1111'],
+    seller: ['Seller in Kashgar', 'Confirm the goods and amount. No account, Mandarin by default.', 'Opens a shop’s link'],
+    customs: ['Customs officer', 'The arrivals queue by risk, the signed history, and the decision.', 'Ayesha · +923001110004 · PIN 4444'],
+    verify: ['Anyone', 'Scan a seal QR and check it. No login.', 'Public check'],
+  },
+  shotsTitle: 'What it looks like',
+  shots: { review: 'Receipt lines with HS codes and price flags', seal: 'The seal QR', seller: 'The seller’s page in Mandarin', urdu: 'Fully right-to-left in Urdu', broken: 'A tampered shipment, caught', customs: 'The customs console' },
+  trustTitle: 'Why it holds',
+  trust: [
+    ['Keys stay on the phone', 'Each person’s signing key is created by the browser and cannot be read, even by the app.'],
+    ['Nothing to take on trust', 'The server stores signatures, not authority. Anyone can re-check a shipment on their own device.'],
+    ['Edits are located, not just detected', 'Every line has its own fingerprint, so a changed price points to its exact line and step.'],
+    ['Built for the pass', 'Checkpoints queue without signal and sync later, with the original time and place kept.'],
+  ],
+  foot: 'Prototype for the Kashgar–Sost corridor. Sandbox money and demo data; customs duties are indicative.',
+}
+
+const zh: typeof en = {
+  title: '每一票过红其拉甫的货，都有签名、可验证。',
+  lead: '商人拍下喀什的收据，卖家在手机上确认，货运用一把永不离开设备的密钥封签，每个检查站都签下自己的位置。到了苏斯特，海关看到的只有一个答案：什么都没变，或者到底哪里变了。',
+  tryIt: '立即体验',
+  checkSeal: '验证封签',
+  demoCaption: '实时演示：有人绕过系统修改了已封签的货单，校验直接指出是哪一行。',
+  demo: {
+    sealed: '已封签 · 3 行 · 所有签名有效',
+    broken: '第 3 步被破坏 · 第 2 行在封签后被修改',
+    restored: '已恢复 · 再次验证通过',
+    line1: '手机快充充电器 20W', line2: '蓝牙耳机', line3: 'LED 灯带 5 米',
+  },
+  journeyTitle: '一票货，五个签名步骤',
+  steps: {
+    scan: ['扫描', '读取中文收据，译成乌尔都语和英语，匹配 HS 编码，异常价格会被标出。'],
+    pay: ['付款', '付款需要商人的 PIN。喀什卖家通过链接用中文确认货物和金额。'],
+    seal: ['封签', '在手机上对确切的货单签名。二维码封签随单据同行，离线也能验证。'],
+    track: ['跟踪', '喀什、红其拉甫、苏斯特：每个检查站签下 GPS 位置，没有信号时先离线排队。'],
+    clear: ['放行', '海关在自己的浏览器里重新验证每个签名，用通俗语言看到风险，并签署决定。'],
+  },
+  rolesTitle: '以这个身份体验',
+  roles: {
+    trader: ['商人', '在手机上扫描收据、付款、封签并跟踪货运。', 'Karim · +923001110001 · PIN 1111'],
+    seller: ['喀什卖家', '确认货物和金额。无需账号，默认中文。', '打开店铺链接'],
+    customs: ['海关官员', '按风险排序的到货队列、签名历史和决定。', 'Ayesha · +923001110004 · PIN 4444'],
+    verify: ['任何人', '扫描封签二维码即可验证，无需登录。', '公开验证'],
+  },
+  shotsTitle: '界面一览',
+  shots: { review: '带 HS 编码和价格提示的收据明细', seal: '封签二维码', seller: '卖家的中文页面', urdu: '乌尔都语完整从右到左', broken: '被篡改的货运，当场发现', customs: '海关工作台' },
+  trustTitle: '为什么可信',
+  trust: [
+    ['密钥留在手机上', '每个人的签名密钥由浏览器生成，任何程序都无法读取，包括本应用。'],
+    ['无需信任任何一方', '服务器保存的是签名，而不是权力。任何人都能在自己的设备上重新验证。'],
+    ['不只发现修改，还能定位', '每一行都有自己的指纹，改了价格就能指出具体哪一行、哪一步。'],
+    ['为山口而设计', '没有信号时检查站记录先排队，之后同步，保留原始时间和地点。'],
+  ],
+  foot: '喀什—苏斯特走廊原型。沙盒资金和演示数据；关税仅供参考。',
+}
+
+const ur: typeof en = {
+  title: 'خنجراب سے گزرنے والی ہر کھیپ، دستخط شدہ اور قابلِ ثبوت۔',
+  lead: 'تاجر کاشغر کی رسید کی تصویر لیتا ہے۔ بیچنے والا اپنے فون سے تصدیق کرتا ہے۔ کھیپ پر ایسی کلید سے مہر لگتی ہے جو کبھی فون سے باہر نہیں جاتی، اور ہر چیک پوائنٹ اپنی جگہ پر دستخط کرتا ہے۔ سوست میں افسر کو ایک ہی جواب ملتا ہے: کچھ نہیں بدلا، یا ٹھیک کیا بدلا۔',
+  tryIt: 'آزمائیں',
+  checkSeal: 'مہر چیک کریں',
+  demoCaption: 'براہِ راست: مہر شدہ مینی فیسٹ کو ایپ کے پیچھے سے بدلا گیا۔ جانچ لائن کا نام بتاتی ہے۔',
+  demo: {
+    sealed: 'مہر بند · 3 لائنیں · تمام دستخط درست',
+    broken: 'مرحلہ 3 پر ٹوٹی · لائن 2 مہر کے بعد بدلی گئی',
+    restored: 'بحال · دوبارہ تصدیق شدہ',
+    line1: 'فون فاسٹ چارجر 20W', line2: 'بلوٹوتھ ایئر فون', line3: 'ایل ای ڈی لائٹ 5 میٹر',
+  },
+  journeyTitle: 'ایک کھیپ، پانچ دستخط شدہ مراحل',
+  steps: {
+    scan: ['اسکین', 'چینی رسید پڑھی جاتی ہے، اردو اور انگریزی میں ترجمہ ہوتا ہے، اور HS کوڈ ملائے جاتے ہیں۔ عجیب قیمتیں نشان زد ہوتی ہیں۔'],
+    pay: ['ادائیگی', 'ادائیگی کے لیے تاجر کا پن چاہیے۔ کاشغر کا بیچنے والا لنک سے، چینی زبان میں، سامان اور رقم کی تصدیق کرتا ہے۔'],
+    seal: ['مہر', 'فون پر بالکل یہی مینی فیسٹ دستخط ہوتا ہے۔ QR مہر کاغذات کے ساتھ جاتی ہے اور بغیر انٹرنیٹ کام کرتی ہے۔'],
+    track: ['ٹریک', 'کاشغر، خنجراب، سوست: ہر چیک پوائنٹ اپنا GPS دستخط کرتا ہے، سگنل نہ ہو تو بعد میں بھیجا جاتا ہے۔'],
+    clear: ['کلیئر', 'کسٹمز اپنے براؤزر میں ہر دستخط دوبارہ جانچتا ہے، خطرہ سادہ جملوں میں دیکھتا ہے، اور فیصلے پر دستخط کرتا ہے۔'],
+  },
+  rolesTitle: 'اس طرح آزمائیں',
+  roles: {
+    trader: ['تاجر', 'فون پر رسید اسکین، ادائیگی، مہر اور ٹریکنگ۔', 'Karim · +923001110001 · PIN 1111'],
+    seller: ['کاشغر کا بیچنے والا', 'سامان اور رقم کی تصدیق۔ کوئی اکاؤنٹ نہیں، چینی زبان میں۔', 'دکان کا لنک کھولیں'],
+    customs: ['کسٹمز افسر', 'خطرے کے حساب سے قطار، دستخط شدہ تاریخ، اور فیصلہ۔', 'Ayesha · +923001110004 · PIN 4444'],
+    verify: ['کوئی بھی', 'مہر کا QR اسکین کر کے جانچیں۔ لاگ اِن نہیں۔', 'عوامی جانچ'],
+  },
+  shotsTitle: 'یہ کیسا دکھتا ہے',
+  shots: { review: 'HS کوڈ اور قیمت کی تنبیہ کے ساتھ رسید', seal: 'مہر کا QR', seller: 'بیچنے والے کا چینی صفحہ', urdu: 'مکمل اردو، دائیں سے بائیں', broken: 'چھیڑی گئی کھیپ، پکڑی گئی', customs: 'کسٹمز کنسول' },
+  trustTitle: 'یہ کیوں قابلِ اعتماد ہے',
+  trust: [
+    ['کلید فون پر رہتی ہے', 'ہر شخص کی دستخطی کلید براؤزر بناتا ہے اور اسے کوئی نہیں پڑھ سکتا، ایپ بھی نہیں۔'],
+    ['کسی پر بھروسے کی ضرورت نہیں', 'سرور دستخط رکھتا ہے، اختیار نہیں۔ کوئی بھی اپنے فون پر کھیپ دوبارہ جانچ سکتا ہے۔'],
+    ['تبدیلی پکڑی بھی جاتی ہے اور بتائی بھی', 'ہر لائن کا اپنا فنگر پرنٹ ہے، اس لیے بدلی قیمت اپنی لائن اور مرحلے کی نشاندہی کرتی ہے۔'],
+    ['پہاڑی راستے کے لیے بنا', 'سگنل نہ ہو تو چیک پوائنٹ قطار میں رہتے ہیں اور بعد میں اصل وقت اور جگہ کے ساتھ جاتے ہیں۔'],
+  ],
+  foot: 'کاشغر–سوست راہداری کا پروٹوٹائپ۔ سینڈ باکس رقم اور ڈیمو ڈیٹا؛ ڈیوٹی اندازاً ہے۔',
+}
+
+export const homeLocales = { en: { home: en }, ur: { home: ur }, zh: { home: zh } }

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LANGS } from '../../shared/i18n'
 import { ApiError } from '../../shared/api'
+import { Logo } from '../../shared/Logo'
 
 export function useLoad<T>(fn: () => Promise<T>, deps: unknown[]) {
   const [data, setData] = useState<T | undefined>()
@@ -60,11 +61,11 @@ export function Shell({ title, back, children, aside }: { title?: ReactNode; bac
             <Chevron /> <span className="ms-1">{t('trader.back')}</span>
           </Link>
         ) : (
-          <span className="min-w-0 truncate text-sm font-semibold tracking-tight">{t('common.appName')}</span>
+          <Link to="/t" aria-label={t('common.appName')} className="flex min-h-12 min-w-0 items-center"><Logo compact size={26} /></Link>
         )}
         <div className="flex shrink-0 items-center whitespace-nowrap">{aside}<LangSwitch /></div>
       </header>
-      <main className="mx-auto max-w-2xl px-4 pb-16 pt-6">
+      <main className="page-enter mx-auto max-w-2xl px-4 pb-16 pt-6">
         {title && <h1 className="mb-6 text-[1.75rem] font-semibold leading-tight tracking-tight text-balance">{title}</h1>}
         {children}
       </main>
@@ -76,7 +77,7 @@ export function Shell({ title, back, children, aside }: { title?: ReactNode; bac
 export function CheckIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden className={`inline-block shrink-0 align-[-0.15em] ${className}`}>
-      <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+      <path className="check-draw" pathLength={1} d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -113,7 +114,7 @@ function Chevron() {
 }
 
 export function Button({ kind = 'primary', busy, children, className = '', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { kind?: 'primary' | 'secondary' | 'quiet'; busy?: boolean }) {
-  const base = 'min-h-14 w-full px-5 text-base font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+  const base = 'press min-h-14 w-full px-5 text-base font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
   const k = kind === 'primary'
     ? 'bg-accent text-accent-fg hover:bg-fg rounded-md'
     : kind === 'secondary'
@@ -127,7 +128,7 @@ export function Button({ kind = 'primary', busy, children, className = '', ...re
 }
 
 export function LinkButton({ to, children }: { to: string; children: ReactNode }) {
-  return <Link to={to} className="flex min-h-14 w-full items-center justify-center rounded-md bg-accent px-5 text-base font-semibold text-accent-fg hover:bg-fg">{children}</Link>
+  return <Link to={to} className="press flex min-h-14 w-full items-center justify-center rounded-md bg-accent px-5 text-base font-semibold text-accent-fg hover:bg-fg">{children}</Link>
 }
 
 function Dots() {
@@ -153,7 +154,7 @@ export function Loading({ label, rows = 4 }: { label?: string; rows?: number }) 
 export function Notice({ tone = 'warn', title, children, action }: { tone?: 'ok' | 'warn' | 'bad' | 'info'; title?: ReactNode; children?: ReactNode; action?: ReactNode }) {
   const c = { ok: 'bg-ok-soft text-ok', warn: 'bg-warn-soft text-warn', bad: 'bg-bad-soft text-bad', info: 'bg-sunken text-fg' }[tone]
   return (
-    <div role={tone === 'bad' ? 'alert' : 'status'} className={`my-4 rounded-md px-4 py-3 ${c}`}>
+    <div role={tone === 'bad' ? 'alert' : 'status'} className={`notice-in my-4 rounded-md px-4 py-3 ${c}`}>
       {title && <p className="font-semibold">{title}</p>}
       {children && <div className="text-[0.95rem] text-fg">{children}</div>}
       {action && <div className="mt-2">{action}</div>}
@@ -188,7 +189,7 @@ export function RiskDot({ band }: { band?: string }) {
   const { t } = useTranslation()
   if (!band) return null
   const tone = /high|red/i.test(band) ? 'bg-bad' : /med|amber|yellow/i.test(band) ? 'bg-warn' : 'bg-ok'
-  return <span className="inline-flex items-center gap-1.5 text-xs text-muted"><span className={`size-2.5 rounded-full ${tone}`} aria-hidden />{t('trader.risk')}: {band}</span>
+  return <span className="inline-flex items-center gap-1.5 text-xs text-muted"><span className={`size-2.5 rounded-full ${tone}`} aria-hidden />{t('trader.risk')}: {t(`common.band.${band}`, { defaultValue: band })}</span>
 }
 
 /** Row in a hairline-divided list. */

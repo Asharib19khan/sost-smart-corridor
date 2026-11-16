@@ -4,6 +4,7 @@ import { Link, Navigate, NavLink, useLocation } from 'react-router-dom'
 import { setSession } from '../../shared/api'
 import { LANGS } from '../../shared/i18n'
 import { useSession } from './session'
+import { Logo } from '../../shared/Logo'
 
 type Role = 'customs' | 'admin'
 
@@ -57,8 +58,8 @@ export function ToolShell({ children }: { children: ReactNode }) {
     <div className="tool min-h-screen bg-canvas text-fg">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2">
-          <Link to="/c" className="text-sm font-semibold">
-            {t('common.appName')}
+          <Link to="/c" aria-label={t('common.appName')} className="me-2">
+            <Logo size={26} />
           </Link>
           <nav className="flex gap-1">
             <NavLink to="/c" end className={active}>
@@ -88,7 +89,7 @@ export function ToolShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-[1400px] px-4 py-4">{children}</main>
+      <main className="page-enter mx-auto max-w-[1400px] px-4 py-4">{children}</main>
     </div>
   )
 }
@@ -122,6 +123,7 @@ export function Empty({ children }: { children: ReactNode }) {
 }
 
 export function RiskBadge({ score, band }: { score: number; band: string }) {
+  const { t } = useTranslation()
   const tone =
     band === 'red' || band === 'high'
       ? 'bg-bad-soft text-bad border-bad'
@@ -130,7 +132,7 @@ export function RiskBadge({ score, band }: { score: number; band: string }) {
         : 'bg-ok-soft text-ok border-ok'
   return (
     <span className={`inline-flex min-w-16 items-center justify-between gap-2 rounded border px-1.5 py-0.5 text-xs font-medium ${tone}`}>
-      <span>{band}</span>
+      <span>{t(`common.band.${band}`, { defaultValue: band })}</span>
       <span className="font-mono tabular-nums">{score}</span>
     </span>
   )
