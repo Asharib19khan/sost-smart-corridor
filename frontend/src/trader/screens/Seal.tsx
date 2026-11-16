@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import QRCode from 'qrcode'
 import { api } from '../../shared/api'
-import { signHash } from '../../shared/crypto/keys'
+import { signWith } from '../../shared/crypto/keys'
 import { ensureKey, signAndPost } from '../lib/device'
 import { useSession } from '../lib/session'
 import { short } from '../lib/money'
@@ -38,7 +38,7 @@ export default function Seal() {
       await signAndPost({
         key, shipmentId: id!, type: 'manifest_sealed', path: `/shipments/${id}/seal`,
         payload: { manifest_hash: man.data.manifest_hash, line_hashes: c.line_hashes, total_fen: c.total_fen, line_count: c.lines.length },
-        extra: async () => ({ manifest_signature: await signHash(key.seed, man.data!.manifest_hash) }),
+        extra: async () => ({ manifest_signature: await signWith(key, man.data!.manifest_hash) }),
       })
       await ship.reload()
     } catch (e) { setErr(errText(e)) } finally { setBusy(false) }

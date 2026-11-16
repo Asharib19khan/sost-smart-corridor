@@ -1,6 +1,6 @@
 // Build and sign a chain event envelope (v1). See backend/app/integrity/service.py for the spec.
 import { canonicalHash, type Json } from './canonical'
-import { b64u, signHash, type DeviceKey } from './keys'
+import { b64u, signWith, type DeviceKey } from './keys'
 
 export type EventType = 'manifest_sealed' | 'seller_confirmed' | 'payment' | 'checkpoint' | 'customs_decision' | 'eseal'
 
@@ -46,5 +46,5 @@ export async function signEnvelope(
     signer_key_id: key.keyId,
   }
   const hash = canonicalHash(envelope as unknown as Json)
-  return { envelope, signature: await signHash(key.seed, hash), hash }
+  return { envelope, signature: await signWith(key, hash), hash }
 }
