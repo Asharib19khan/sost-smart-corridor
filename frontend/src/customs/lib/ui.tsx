@@ -96,9 +96,10 @@ export function ToolShell({ children }: { children: ReactNode }) {
 export function Loading({ label }: { label?: string }) {
   const { t } = useTranslation()
   return (
-    <p className="py-6 text-sm text-muted" role="status">
-      {label ?? t('common.loading')}
-    </p>
+    <div role="status" aria-live="polite" className="py-3">
+      <span className="sr-only">{label ?? t('common.loading')}</span>
+      {[72, 55, 64].map((w) => <span key={w} aria-hidden className="skeleton my-3 h-3.5 rounded" style={{ width: `${w}%` }} />)}
+    </div>
   )
 }
 

@@ -134,9 +134,20 @@ function Dots() {
   return <span className="inline-flex gap-1" aria-label="…">{[0, 1, 2].map((i) => <span key={i} className="size-1.5 animate-pulse rounded-full bg-current" style={{ animationDelay: `${i * 150}ms` }} />)}</span>
 }
 
-export function Loading({ label }: { label?: string }) {
+/** Placeholder rows in the shape of a list, so a slow network reads as "arriving", not "broken". */
+export function Loading({ label, rows = 4 }: { label?: string; rows?: number }) {
   const { t } = useTranslation()
-  return <p role="status" className="py-10 text-muted">{label ?? t('common.loading')}</p>
+  return (
+    <div role="status" aria-live="polite" className="py-4">
+      <span className="sr-only">{label ?? t('common.loading')}</span>
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} aria-hidden className="flex items-center justify-between gap-6 border-b border-line py-4">
+          <span className="skeleton h-4 rounded" style={{ width: `${[58, 44, 66, 50][i % 4]}%` }} />
+          <span className="skeleton h-4 w-16 rounded" />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function Notice({ tone = 'warn', title, children, action }: { tone?: 'ok' | 'warn' | 'bad' | 'info'; title?: ReactNode; children?: ReactNode; action?: ReactNode }) {
