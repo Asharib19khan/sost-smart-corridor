@@ -320,6 +320,18 @@ Two honest limits of plain `http` on a phone: browsers only allow **GPS and the 
 normal camera app rather than the in-page scanner. Some venue Wi-Fi blocks device-to-device traffic; a phone hotspot
 from your own phone is the reliable fallback.
 
+### A free https address (for phones at the showcase)
+
+```powershell
+.\dev.ps1 -Share
+```
+
+This also starts a Cloudflare quick tunnel (free, no account, no domain) and opens the app at its
+`https://….trycloudflare.com` address. Over https, phones allow GPS and the in-page camera scanner, and visitors
+can scan a seal QR with their own phone from anywhere. Keep using that address on the laptop too, so the QR
+codes and shared links it creates point to it. The address changes every run, and receipt reading keeps working
+because it runs on this laptop.
+
 ### Use Supabase instead of the local database
 
 By default the app uses a local SQLite file. To use Postgres (for example Supabase), put the **session pooler** string in
