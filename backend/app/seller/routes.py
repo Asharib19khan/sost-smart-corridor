@@ -1,5 +1,9 @@
 """Seller link (no login; the link token is the credential) + public seller list."""
 
+import base64
+import hashlib
+import hmac
+import time
 from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -7,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from ..core.config import settings
 from ..core.crypto import b64u_dec, key_fingerprint
 from ..core.db import (
     DeviceKey,
@@ -36,11 +41,38 @@ class ConfirmIn(BaseModel):
     signature: str
 
 
+LINK_DAYS = 14
+
+
+def _link_sig(link_token: str, exp: int) -> str:
+    mac = hmac.new(settings.jwt_secret.encode(), f"seller-link:{link_token}.{exp}".encode(), hashlib.sha256)
+    return base64.urlsafe_b64encode(mac.digest()[:16]).decode().rstrip("=")
+
+
+def signed_link_token(s: Seller, days: int = LINK_DAYS) -> str:
+    """What a trader shares: the shop's token, an expiry, and a signature over both."""
+    exp = int(time.time()) + days * 86400
+    return f"{s.link_token}.{exp}.{_link_sig(s.link_token, exp)}"
+
+
 def _seller(db: Session, token: str) -> Seller:
-    s = db.scalar(select(Seller).where(Seller.link_token == token))
+    bad = HTTPException(404, "This seller link is not valid. Ask the trader for a new link. "
+                             "此链接无效，请向商人索取新链接。")
+    parts = token.split(".")
+    if len(parts) == 3:
+        raw, exp_s, sig = parts
+        if not exp_s.isdigit() or not hmac.compare_digest(sig, _link_sig(raw, int(exp_s))):
+            raise bad
+        if int(exp_s) < time.time():
+            raise HTTPException(410, "This link has expired. Ask the trader to send a new one. "
+                                     "此链接已过期，请让商人重新发送。")
+    elif len(parts) == 1 and settings.demo_mode:
+        raw = token  # fixed demo links (/s/kashgar-bazaar-01) only exist in demo mode
+    else:
+        raise bad
+    s = db.scalar(select(Seller).where(Seller.link_token == raw))
     if s is None:
-        raise HTTPException(404, "This seller link is not valid. Ask the trader for a new link. "
-                                 "此链接无效，请向商人索取新链接。")
+        raise bad
     return s
 
 
@@ -92,7 +124,7 @@ def seller_link_token(seller_id: str, user: User = Depends(require_role("trader"
                   .where(Payment.seller_id == s.id, Shipment.trader_id == user.id).limit(1))
     if not deals:
         raise HTTPException(403, "You can share a shop's link once you have a receipt from that shop.")
-    return {"seller": _seller_out(s), "path": f"/s/{s.link_token}"}
+    return {"seller": _seller_out(s), "path": f"/s/{signed_link_token(s)}", "expires_in_days": LINK_DAYS}
 
 
 @router.get("/seller-link/{token}")
