@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-labelledby="t d">
+  <title id="t">Tamper detection</title>
+  <desc id="d">Six signed events are chained by hash. An attacker edits a price after sealing; the sealed event and every later link turn red and the banner reports the exact line. Restoring the data turns it green again.</desc>
+  <style>
+    .bg{fill:#f4f1ea}
+    .blk{fill:#fff;stroke:#d9d2c3;stroke-width:2}
+    .n{font:700 13px "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;fill:#5f5d57}
+    .ty{font:600 17px "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;fill:#1b1d1c}
+    .h{font:500 12px "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;fill:#5f5d57}
+    .link{stroke:#d9d2c3;stroke-width:3;fill:none}
+    .ban{font:700 19px "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+    .small{font:400 14px "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;fill:#5f5d57}
+    /* one 14 s loop: build -> attack -> detect -> restore */
+    .b{opacity:0;animation:build 14s ease-out infinite}
+    .b1{animation-delay:.0s}.b2{animation-delay:.35s}.b3{animation-delay:.7s}.b4{animation-delay:1.05s}.b5{animation-delay:1.4s}.b6{animation-delay:1.75s}
+    @keyframes build{0%{opacity:0;transform:translateY(14px)}5%,92%{opacity:1;transform:none}98%,100%{opacity:0}}
+    .okring{stroke:#1f7a3d;stroke-width:3;fill:#e3f1e6;opacity:0;animation:okc 14s linear infinite}
+    @keyframes okc{0%,16%{opacity:0}18%,48%{opacity:1}50%,60%{opacity:0}78%,92%{opacity:1}96%,100%{opacity:0}}
+    .keep{animation:keep 14s linear infinite}
+    @keyframes keep{0%,16%{opacity:0}18%,92%{opacity:1}96%,100%{opacity:0}}
+    .badring{stroke:#b42318;stroke-width:3;fill:#fbe5e2;opacity:0}
+    .bad2{animation:bad 14s linear infinite}
+    .bad3{animation:bad 14s linear infinite .25s}.bad4{animation:bad 14s linear infinite .5s}.bad5{animation:bad 14s linear infinite .75s}.bad6{animation:bad 14s linear infinite 1s}
+    @keyframes bad{0%,49%{opacity:0}52%,74%{opacity:1}77%,100%{opacity:0}}
+    .attack{opacity:0;animation:atk 14s linear infinite}
+    @keyframes atk{0%,38%{opacity:0;transform:translate(0,-18px)}42%,52%{opacity:1;transform:none}56%,100%{opacity:0}}
+    .shake{animation:shk 14s linear infinite;transform-box:fill-box;transform-origin:center}
+    @keyframes shk{0%,45%{transform:none}46%{transform:translateX(-4px)}47%{transform:translateX(4px)}48%{transform:translateX(-3px)}49%,100%{transform:none}}
+    .panel{opacity:0}
+    .pOk{animation:pok 14s linear infinite}
+    .pBad{animation:pbad 14s linear infinite}
+    .pRest{animation:prest 14s linear infinite}
+    @keyframes pok{0%,16%{opacity:0}20%,36%{opacity:1}40%,100%{opacity:0}}
+    @keyframes pbad{0%,53%{opacity:0}57%,72%{opacity:1}76%,100%{opacity:0}}
+    @keyframes prest{0%,78%{opacity:0}82%,92%{opacity:1}96%,100%{opacity:0}}
+    .code{font:500 14px "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;fill:#fff}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important}.b{opacity:1}.pBad{opacity:1}.bad2,.bad3,.bad4,.bad5,.bad6{opacity:1}}
+  </style>
+  <rect class="bg" width="1200" height="360" rx="20"/>
+  <!-- links -->
+  <g class="link"><path d="M196 150 H238"/><path d="M386 150 H428"/><path d="M576 150 H618"/><path d="M766 150 H808"/><path d="M956 150 H998"/></g>
+  <!-- blocks -->
+  <g transform="translate(48,92)">
+    <g class="b b1"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring keep" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">1</text><text class="ty" x="14" y="58">payment</text><text class="h" x="14" y="84">a91f&#8230;c20e</text></g>
+  </g>
+  <g transform="translate(238,92)">
+    <g class="b b2"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring keep" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">2</text><text class="ty" x="14" y="58">seller signs</text><text class="h" x="14" y="84">7be0&#8230;19d4</text></g>
+  </g>
+  <g transform="translate(428,92)">
+    <g class="b b3"><g class="shake"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring" x="0" y="0" width="148" height="116" rx="12"/><rect class="badring bad2" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">3</text><text class="ty" x="14" y="58">manifest sealed</text><text class="h" x="14" y="84">18d5&#8230;bd83</text></g></g>
+  </g>
+  <g transform="translate(618,92)">
+    <g class="b b4"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring" x="0" y="0" width="148" height="116" rx="12"/><rect class="badring bad3" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">4</text><text class="ty" x="14" y="58">Kashgar</text><text class="h" x="14" y="84">c3a2&#8230;70f1</text></g>
+  </g>
+  <g transform="translate(808,92)">
+    <g class="b b5"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring" x="0" y="0" width="148" height="116" rx="12"/><rect class="badring bad4" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">5</text><text class="ty" x="14" y="58">Khunjerab</text><text class="h" x="14" y="84">0d7c&#8230;e58a</text></g>
+  </g>
+  <g transform="translate(998,92)">
+    <g class="b b6"><rect class="blk" width="148" height="116" rx="12"/><rect class="okring" x="0" y="0" width="148" height="116" rx="12"/><rect class="badring bad5" x="0" y="0" width="148" height="116" rx="12"/><text class="n" x="14" y="26">6</text><text class="ty" x="14" y="58">Sost</text><text class="h" x="14" y="84">f26b&#8230;3391</text></g>
+  </g>
+  <!-- attacker -->
+  <g transform="translate(428,36)"><g class="attack">
+    <rect width="262" height="40" rx="8" fill="#1b1d1c"/>
+    <text class="code" x="14" y="26">UPDATE lines SET price = 100</text>
+  </g></g>
+  <!-- status panels -->
+  <g transform="translate(48,258)">
+    <g class="panel pOk"><rect width="1098" height="64" rx="12" fill="#e3f1e6" stroke="#1f7a3d" stroke-width="2"/><text class="ban" x="24" y="30" fill="#1f7a3d">Integrity: verified</text><text class="small" x="24" y="52">Every line matches what was sealed. Every signature checks out on this device.</text></g>
+    <g class="panel pBad"><rect width="1098" height="64" rx="12" fill="#fbe5e2" stroke="#b42318" stroke-width="2"/><text class="ban" x="24" y="30" fill="#b42318">Integrity: broken at step 3 &#8212; line 2 was edited after sealing</text><text class="small" x="24" y="52">The seal&#8217;s own signature is still valid. The data underneath it is not what was signed.</text></g>
+    <g class="panel pRest"><rect width="1098" height="64" rx="12" fill="#e3f1e6" stroke="#1f7a3d" stroke-width="2"/><text class="ban" x="24" y="30" fill="#1f7a3d">Original data restored &#8212; verified again</text><text class="small" x="24" y="52">The attack stays in the append-only audit log.</text></g>
+  </g>
+</svg>

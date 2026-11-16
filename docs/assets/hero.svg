@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" role="img" aria-labelledby="t d">
+  <title id="t">Sost Smart Corridor</title>
+  <desc id="d">A truck travels the route from Kashgar over Khunjerab to Sost under the Karakoram mountains, signing a checkpoint at each stop.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b3b3a"/><stop offset="0.65" stop-color="#0f5f5c"/><stop offset="1" stop-color="#2f8a84"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4f1ea" stop-opacity="0"/><stop offset="0.5" stop-color="#f4f1ea" stop-opacity=".9"/><stop offset="1" stop-color="#f4f1ea" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="frame"><rect width="1200" height="440" rx="20"/></clipPath>
+  </defs>
+  <style>
+    .title{font:700 64px/1 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;fill:#f4f1ea;letter-spacing:-1.5px}
+    .sub{font:400 22px "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;fill:#d7e8e5}
+    .lab{font:600 15px "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;fill:#f4f1ea}
+    .cap{font:500 12px "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;fill:#b7d5d1}
+    .far{animation:drift 60s linear infinite}
+    .mid{animation:drift 38s linear infinite}
+    .near{animation:drift 24s linear infinite}
+    @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-600px)}}
+    .star{animation:tw 3s ease-in-out infinite}
+    .star:nth-of-type(2n){animation-delay:.8s}.star:nth-of-type(3n){animation-delay:1.6s}
+    @keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+    .ping{transform-box:fill-box;transform-origin:center;animation:ping 4.8s ease-out infinite}
+    .p2{animation-delay:1.6s}.p3{animation-delay:3.2s}
+    @keyframes ping{0%{transform:scale(.6);opacity:.9}35%,100%{transform:scale(3.2);opacity:0}}
+    .tag{opacity:0;animation:tag 4.8s ease-in-out infinite}
+    .t2{animation-delay:1.6s}.t3{animation-delay:3.2s}
+    @keyframes tag{0%{opacity:0;transform:translateY(6px)}8%,28%{opacity:1;transform:translateY(0)}38%,100%{opacity:0}}
+    .route{stroke-dasharray:3 9;animation:dash 1.4s linear infinite}
+    @keyframes dash{to{stroke-dashoffset:-24}}
+    .in{opacity:0;animation:in 1.2s ease-out .2s forwards}
+    .in2{opacity:0;animation:in 1.2s ease-out .5s forwards}
+    @keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    .shine{animation:shine 6s ease-in-out infinite}
+    @keyframes shine{0%{transform:translateX(-600px)}60%,100%{transform:translateX(1500px)}}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important}}
+  </style>
+  <g clip-path="url(#frame)">
+    <rect width="1200" height="440" fill="url(#sky)"/>
+    <g fill="#f4f1ea">
+      <circle class="star" cx="90" cy="48" r="1.6"/><circle class="star" cx="240" cy="90" r="1.2"/><circle class="star" cx="410" cy="36" r="1.6"/>
+      <circle class="star" cx="560" cy="80" r="1.2"/><circle class="star" cx="760" cy="40" r="1.6"/><circle class="star" cx="930" cy="96" r="1.2"/>
+      <circle class="star" cx="1090" cy="52" r="1.6"/><circle class="star" cx="1160" cy="120" r="1.2"/>
+    </g>
+    <!-- parallax ridges: each strip is 1800 wide and loops by 600 so the pattern repeats seamlessly -->
+    <g class="far"><path d="M0 300 L90 235 L160 270 L260 190 L350 262 L450 215 L540 275 L600 300 L690 235 L760 270 L860 190 L950 262 L1050 215 L1140 275 L1200 300 L1290 235 L1360 270 L1460 190 L1550 262 L1650 215 L1740 275 L1800 300 V440 H0Z" fill="#1c6f6b" opacity=".55"/></g>
+    <g class="mid"><path d="M0 340 L110 262 L190 310 L300 225 L390 305 L500 250 L600 340 L710 262 L790 310 L900 225 L990 305 L1100 250 L1200 340 L1310 262 L1390 310 L1500 225 L1590 305 L1700 250 L1800 340 V440 H0Z" fill="#0b4a48" opacity=".8"/>
+      <path d="M300 225 l-26 38 l18 -9 l8 14 l10 -16 l16 10z M900 225 l-26 38 l18 -9 l8 14 l10 -16 l16 10z M1500 225 l-26 38 l18 -9 l8 14 l10 -16 l16 10z" fill="#f4f1ea" opacity=".85"/></g>
+    <g class="near"><path d="M0 385 L80 335 L170 372 L270 318 L370 376 L470 340 L600 385 L680 335 L770 372 L870 318 L970 376 L1070 340 L1200 385 L1280 335 L1370 372 L1470 318 L1570 376 L1670 340 L1800 385 V440 H0Z" fill="#072d2c"/></g>
+
+    <!-- title -->
+    <g class="in"><text class="title" x="64" y="118">Sost Smart Corridor</text></g>
+    <g class="in2">
+      <text class="sub" x="66" y="158">Trust that travels with the goods &#8212; Kashgar &#8594; Khunjerab &#8594; Sost.</text>
+      <text class="cap" x="66" y="188">SIGN &#183; SEAL &#183; VERIFY &#8212; NOTHING ON SCREEN IS HARD-CODED TO LOOK LIKE IT WORKS</text>
+    </g>
+
+    <!-- route -->
+    <path id="route" d="M110 330 C 260 270, 330 370, 470 318 S 700 255, 810 312 S 1000 360, 1090 318" fill="none" stroke="#f4f1ea" stroke-opacity=".75" stroke-width="3" class="route"/>
+    <g>
+      <circle cx="110" cy="330" r="7" fill="#f4f1ea"/><circle class="ping" cx="110" cy="330" r="7" fill="none" stroke="#f4f1ea" stroke-width="2"/>
+      <circle cx="600" cy="291" r="7" fill="#f4f1ea"/><circle class="ping p2" cx="600" cy="291" r="7" fill="none" stroke="#f4f1ea" stroke-width="2"/>
+      <circle cx="1090" cy="318" r="7" fill="#f4f1ea"/><circle class="ping p3" cx="1090" cy="318" r="7" fill="none" stroke="#f4f1ea" stroke-width="2"/>
+      <text class="lab" x="110" y="362" text-anchor="middle">Kashgar</text>
+      <text class="lab" x="600" y="266" text-anchor="middle">Khunjerab Pass</text>
+      <text class="lab" x="1090" y="350" text-anchor="middle">Sost</text>
+      <g class="tag"><rect x="52" y="232" width="150" height="26" rx="13" fill="#f4f1ea"/><text class="cap" x="127" y="249" text-anchor="middle" fill="#0b3b3a" style="fill:#0b3b3a">checkpoint signed &#10003;</text></g>
+      <g class="tag t2"><rect x="525" y="205" width="150" height="26" rx="13" fill="#f4f1ea"/><text class="cap" x="600" y="222" text-anchor="middle" style="fill:#0b3b3a">checkpoint signed &#10003;</text></g>
+      <g class="tag t3"><rect x="1015" y="262" width="150" height="26" rx="13" fill="#f4f1ea"/><text class="cap" x="1090" y="279" text-anchor="middle" style="fill:#0b3b3a">checkpoint signed &#10003;</text></g>
+    </g>
+    <!-- truck -->
+    <g>
+      <g>
+        <rect x="-17" y="-17" width="22" height="14" rx="2" fill="#f4f1ea"/>
+        <path d="M5 -17 h8 l6 7 v7 h-14z" fill="#d7e8e5"/>
+        <circle cx="-9" cy="-1" r="3.4" fill="#072d2c" stroke="#f4f1ea" stroke-width="1.5"/>
+        <circle cx="11" cy="-1" r="3.4" fill="#072d2c" stroke="#f4f1ea" stroke-width="1.5"/>
+        <animateMotion dur="9.6s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#route"/></animateMotion>
+      </g>
+    </g>
+    <rect class="shine" x="0" y="0" width="260" height="440" fill="url(#glow)" opacity=".10" transform="skewX(-18)"/>
+  </g>
+</svg>
