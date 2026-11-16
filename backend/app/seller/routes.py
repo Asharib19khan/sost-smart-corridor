@@ -3,7 +3,7 @@
 from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,7 +19,7 @@ from ..core.db import (
     User,
     get_db,
 )
-from ..core.deps import audit, current_user
+from ..core.deps import audit, current_user, require_role
 from ..integrity.manifest import manifest_doc, manifest_hash
 from ..integrity.service import GENESIS
 from ..shipments import service as svc
@@ -57,6 +57,42 @@ def _pending_ids(db: Session, s: Seller) -> list[str]:
 @router.get("/sellers")
 def list_sellers(_: User = Depends(current_user), db: Session = Depends(get_db)) -> list[dict]:
     return [_seller_out(s) for s in db.scalars(select(Seller).order_by(Seller.shop_name_en))]
+
+
+class SellerIn(BaseModel):
+    shop_name_zh: str = Field(min_length=2, max_length=160)
+    shop_name_en: str = Field(min_length=2, max_length=160)
+    market: str = Field(default="Kashgar", min_length=2, max_length=120)
+
+
+@router.post("/sellers", status_code=201)
+def add_seller(body: SellerIn, request: Request, user: User = Depends(require_role("trader")),
+               db: Session = Depends(get_db)) -> dict:
+    """A trader adds a shop they buy from. Same shop name in the same market is reused, not duplicated."""
+    zh, en, market = body.shop_name_zh.strip(), body.shop_name_en.strip(), body.market.strip()
+    s = db.scalar(select(Seller).where(Seller.shop_name_zh == zh, Seller.market == market))
+    if s is None:
+        s = Seller(shop_name_zh=zh, shop_name_en=en, market=market)
+        db.add(s)
+        db.flush()
+        audit(db, request, user.id, "seller.add", s.id, {"market": market})
+    db.commit()
+    return _seller_out(s)
+
+
+@router.get("/sellers/{seller_id}/link")
+def seller_link_token(seller_id: str, user: User = Depends(require_role("trader")),
+                      db: Session = Depends(get_db)) -> dict:
+    """The shop's confirmation link, for a trader who has a receipt or payment with that shop."""
+    s = db.get(Seller, seller_id)
+    if s is None:
+        raise HTTPException(404, "Shop not found.")
+    deals = db.scalar(select(Receipt.id).join(Shipment, Shipment.id == Receipt.shipment_id)
+                      .where(Receipt.seller_id == s.id, Shipment.trader_id == user.id).limit(1)) or         db.scalar(select(Payment.id).join(Shipment, Shipment.id == Payment.shipment_id)
+                  .where(Payment.seller_id == s.id, Shipment.trader_id == user.id).limit(1))
+    if not deals:
+        raise HTTPException(403, "You can share a shop's link once you have a receipt from that shop.")
+    return {"seller": _seller_out(s), "path": f"/s/{s.link_token}"}
 
 
 @router.get("/seller-link/{token}")

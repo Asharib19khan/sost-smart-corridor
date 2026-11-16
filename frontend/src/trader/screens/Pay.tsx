@@ -5,6 +5,7 @@ import { api } from '../../shared/api'
 import { fen, paisa } from '../lib/money'
 import { useSession } from '../lib/session'
 import { ensureKey, signAndPost } from '../lib/device'
+import { publicOrigin, shareLink } from '../lib/share'
 import type { ManifestLine, Seller, ShipmentDetail } from '../lib/types'
 import { CheckIcon, ErrorBox, Button, LinkButton, Loading, Notice, PinPad, Row, Shell, errText, useLoad } from '../lib/ui'
 
@@ -66,7 +67,8 @@ export default function Pay() {
               <li key={r.id} className="border-b border-line py-4">
                 <div className="mb-3 flex items-baseline justify-between"><span className="font-semibold">{sellerName(r.seller_id)}</span><span dir="ltr" className="font-semibold tabular-nums">{fen(r.amount)}</span></div>
                 {r.paid ? <><p className="flex items-center gap-1.5 font-semibold text-ok"><CheckIcon />{t('trader.pay.paid')}</p>
-                  <p className={`mt-1 flex items-start gap-1.5 text-sm ${r.confirmed ? 'text-ok' : 'text-warn'}`}>{r.confirmed && <CheckIcon className="mt-0.5" />}{t(r.confirmed ? 'trader.pay.sellerOk' : 'trader.pay.sellerWait')}</p></>
+                  <p className={`mt-1 flex items-start gap-1.5 text-sm ${r.confirmed ? 'text-ok' : 'text-warn'}`}>{r.confirmed && <CheckIcon className="mt-0.5" />}{t(r.confirmed ? 'trader.pay.sellerOk' : 'trader.pay.sellerWait')}</p>
+                  {!r.confirmed && r.seller_id && <ShareSeller sellerId={r.seller_id} shipRef={ship.data?.ref ?? ''} />}</>
                   : !r.seller_id ? <p className="text-warn">{t('trader.pay.noSeller')}</p>
                     : <Button busy={busy === r.id} disabled={pin.length < 4 || !!busy} onClick={() => void pay(r)}>{t('trader.pay.send', { amount: fen(r.amount) })}</Button>}
               </li>
@@ -80,5 +82,25 @@ export default function Pay() {
         </>
       )}
     </Shell>
+  )
+}
+
+function ShareSeller({ sellerId, shipRef }: { sellerId: string; shipRef: string }) {
+  const { t } = useTranslation()
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const send = async () => {
+    setBusy(true); setMsg(null)
+    try {
+      const { path } = await api<{ path: string }>(`/sellers/${sellerId}/link`)
+      const res = await shareLink({ title: t('trader.pay.shareTitle', { ref: shipRef }), text: t('trader.pay.shareText', { ref: shipRef }), url: publicOrigin() + path })
+      setMsg(res === 'failed' ? { ok: false, text: t('trader.pay.shareFail') } : { ok: true, text: t(res === 'copied' ? 'trader.pay.copied' : 'trader.pay.shared') })
+    } catch (e) { setMsg({ ok: false, text: errText(e) }) } finally { setBusy(false) }
+  }
+  return (
+    <div className="mt-3">
+      <Button kind="secondary" busy={busy} onClick={() => void send()}>{t('trader.pay.share')}</Button>
+      {msg && <p role="status" className={`mt-2 text-sm ${msg.ok ? 'text-ok' : 'text-bad'}`}>{msg.text}</p>}
+    </div>
   )
 }

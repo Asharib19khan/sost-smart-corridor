@@ -143,13 +143,19 @@ def test_full_story(c):
     assert r.status_code in (400, 409), r.text
 
     # 3. Seller counter-signs from the Mandarin link
-    link = c.get("/sellers", headers=karim.h).json()[0]
-    token = c.get("/admin/users", headers=admin.h).status_code  # admin reachable
-    assert token == 200
+    assert c.get("/admin/users", headers=admin.h).status_code == 200  # admin reachable
+    # The trader shares the shop's link; a trader with no dealings with that shop cannot get it.
+    shared = c.get(f"/sellers/{seller['id']}/link", headers=karim.h)
+    assert shared.status_code == 200, shared.text
+    assert c.get(f"/sellers/{seller['id']}/link", headers=nasreen.h).status_code == 403
+    tok = shared.json()["path"].rsplit("/", 1)[-1]
+    # Adding a shop: new shops are created once, the same shop again is reused.
+    new_shop = {"shop_name_zh": "喀什 测试商店", "shop_name_en": "Test Shop, Kashgar", "market": "Kashgar"}
+    a = c.post("/sellers", headers=karim.h, json=new_shop)
+    assert a.status_code == 201, a.text
+    assert c.post("/sellers", headers=karim.h, json=new_shop).json()["id"] == a.json()["id"]
+    assert c.post("/sellers", headers=officer.h, json=new_shop).status_code == 403
     seller_actor = Actor(c)
-    from app.core.db import Seller, SessionLocal
-    with SessionLocal() as db:
-        tok = db.get(Seller, link["id"]).link_token
     r = c.post(f"/seller-link/{tok}/key", json={"public_key": seller_actor.pub})
     assert r.status_code in (200, 201), r.text
     page = c.get(f"/seller-link/{tok}").json()

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '../../shared/api'
 import { fen } from '../lib/money'
 import type { Receipt, Seller, ShipmentDetail } from '../lib/types'
-import { Button, ErrorBox, LinkButton, Loading, Notice, Shell, errText, useLoad } from '../lib/ui'
+import { Button, ErrorBox, Field, LinkButton, Loading, Notice, Shell, errText, useLoad } from '../lib/ui'
 
 /** Upload a receipt photo; the server reads it in the background. We poll until it is done. */
 export default function Scan() {
@@ -57,6 +57,7 @@ export default function Scan() {
           {sellers.data?.map((s) => <option key={s.id} value={s.id}>{s.shop_name_en} · {s.shop_name_zh} — {s.market}</option>)}
         </select>
       </label>
+      <AddShop onAdded={(sid) => { void sellers.reload().then(() => setSellerId(sid)) }} />
       <label className="mb-4 flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-fg bg-surface px-4 text-center">
         <span className="font-semibold">{file ? file.name : t('trader.scan.pick')}</span>
         <span className="text-sm text-muted">{t('trader.scan.formats')}</span>
@@ -83,5 +84,36 @@ export default function Scan() {
       )}
       {!!ship.data?.lines.length && <div className="mt-6"><LinkButton to={`/t/s/${id}/review`}>{t('trader.scan.next')}</LinkButton></div>}
     </Shell>
+  )
+}
+
+function AddShop({ onAdded }: { onAdded: (id: string) => void }) {
+  const { t } = useTranslation()
+  const [open, setOpen] = useState(false)
+  const [zh, setZh] = useState('')
+  const [en, setEn] = useState('')
+  const [market, setMarket] = useState('Kashgar')
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  if (!open) return <Button kind="quiet" className="-mt-2 mb-4" onClick={() => setOpen(true)}>{t('trader.scan.addShop')}</Button>
+  const save = async () => {
+    setBusy(true); setErr(null)
+    try {
+      const s = await api<Seller>('/sellers', { body: { shop_name_zh: zh.trim(), shop_name_en: en.trim(), market: market.trim() } })
+      onAdded(s.id); setOpen(false); setZh(''); setEn('')
+    } catch (e) { setErr(errText(e)) } finally { setBusy(false) }
+  }
+  const ok = zh.trim().length >= 2 && en.trim().length >= 2 && market.trim().length >= 2
+  return (
+    <fieldset className="mb-6 rounded-md border border-line bg-surface p-4">
+      <Field label={t('trader.scan.shopZh')} lang="zh" value={zh} onChange={(e) => setZh(e.target.value)} autoComplete="off" />
+      <Field label={t('trader.scan.shopEn')} value={en} onChange={(e) => setEn(e.target.value)} autoComplete="off" />
+      <Field label={t('trader.scan.market')} value={market} onChange={(e) => setMarket(e.target.value)} autoComplete="off" />
+      {err && <ErrorBox message={err} />}
+      <div className="flex gap-3">
+        <Button kind="secondary" className="flex-1" onClick={() => setOpen(false)}>{t('trader.scan.cancelShop')}</Button>
+        <Button className="flex-1" busy={busy} disabled={!ok} onClick={() => void save()}>{t('trader.scan.saveShop')}</Button>
+      </div>
+    </fieldset>
   )
 }

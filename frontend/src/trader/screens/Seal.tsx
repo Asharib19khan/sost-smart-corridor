@@ -8,15 +8,8 @@ import { ensureKey, signAndPost } from '../lib/device'
 import { useSession } from '../lib/session'
 import { short } from '../lib/money'
 import type { Manifest, ShipmentDetail } from '../lib/types'
+import { copyText, publicOrigin } from '../lib/share'
 
-// navigator.clipboard only exists on https/localhost; phones on the LAN demo use plain http, so fall back to execCommand.
-async function copyText(text: string): Promise<boolean> {
-  try { await navigator.clipboard.writeText(text); return true } catch { /* fall through */ }
-  const ta = document.createElement('textarea')
-  ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'
-  document.body.appendChild(ta); ta.select()
-  try { return document.execCommand('copy') } catch { return false } finally { ta.remove() }
-}
 import { Button, ErrorBox, LinkButton, Loading, Mono, Notice, Shell, errText, useLoad } from '../lib/ui'
 
 /** Seal = sign the exact manifest hash. After this, changing any line breaks the seal. */
@@ -31,9 +24,7 @@ export default function Seal() {
   const [png, setPng] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const seal = ship.data?.seal ?? null
-  // VITE_PUBLIC_ORIGIN lets a laptop on localhost still print QR codes that visitors' phones can open.
-  const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
-  const origin = (local && (import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined)?.replace(/\/$/, '')) || location.origin
+  const origin = publicOrigin()
   const url = seal ? `${origin}/v/${id}#${seal}` : null
 
   useEffect(() => { if (url) void QRCode.toDataURL(url, { margin: 1, width: 300, errorCorrectionLevel: 'M' }).then(setPng) }, [url])
