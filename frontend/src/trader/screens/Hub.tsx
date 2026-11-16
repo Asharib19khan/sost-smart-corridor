@@ -4,6 +4,7 @@ import { api } from '../../shared/api'
 import { fen } from '../lib/money'
 import type { ShipmentDetail } from '../lib/types'
 import { CheckIcon, ChevronEnd, ErrorBox, LinkButton, Loading, Notice, RiskDot, Row, Shell, StateLabel, useLoad } from '../lib/ui'
+import { localizeServerText } from '../../shared/serverText'
 
 /** The single next step, derived from the server's allowed_next plus what is on file. */
 export function nextAction(s: ShipmentDetail): { key: string; to: string } | null {
@@ -47,7 +48,7 @@ export default function Hub() {
             <Row label={t('trader.hub.total')}><span dir="ltr">{fen(s.lines.reduce((a, l) => a + l.total_fen, 0))}</span></Row>
           </div>
           {s.risk?.reasons?.length ? (
-            <ul className="mt-4 text-sm text-muted">{s.risk.reasons.map((r) => <li key={r} className="py-1">{r}</li>)}</ul>
+            <ul className="mt-4 text-sm text-muted">{s.risk.reasons.map((r) => <li key={r} className="py-1">{localizeServerText(t, r)}</li>)}</ul>
           ) : null}
           <Steps s={s} current={act?.key} />
         </>

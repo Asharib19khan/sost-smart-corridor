@@ -6,6 +6,7 @@ import { api } from '../shared/api'
 import { Guard, ToolShell } from '../customs/lib/ui'
 import { useAsync } from '../customs/lib/useAsync'
 import type { QueueRow, VerifyReport } from '../customs/lib/types'
+import { localizeServerText } from '../shared/serverText'
 
 type Action = 'edit_line_price' | 'edit_line_qty' | 'delete_event' | 'swap_events' | 'edit_event_payload'
 const ACTIONS: { id: Action; needs: ('line_no' | 'seq' | 'value')[] }[] = [
@@ -79,8 +80,8 @@ function TamperLab() {
       {checking && <p className="mt-3 text-sm text-muted" role="status">{t('admin.tamper.checking')}</p>}
       {report && (
         <div data-testid="tamper-result" className={`mt-3 rounded border px-3 py-2 text-sm font-semibold ${report.overall.ok ? 'border-ok bg-ok-soft text-ok' : 'border-bad bg-bad-soft text-bad'}`}>
-          {report.overall.message}
-          {report.manifest.problems.length > 0 && <ul className="mt-1 font-normal">{report.manifest.problems.map((p) => <li key={p.line_no}>line {p.line_no}: {p.problem}</li>)}</ul>}
+          {localizeServerText(t, report.overall.message)}
+          {report.manifest.problems.length > 0 && <ul className="mt-1 font-normal">{report.manifest.problems.map((p) => <li key={p.line_no}>{localizeServerText(t, p.problem)} · #{p.line_no}</li>)}</ul>}
         </div>
       )}
     </section>

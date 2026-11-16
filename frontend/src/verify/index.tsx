@@ -10,6 +10,7 @@ import { Button, ErrorBox, Field, Loading, Mono, Notice, Shell, StatusMark, errT
 import { when } from '../customs/lib/format'
 import { short } from '../trader/lib/money'
 import type { VerifyReport } from '../trader/lib/types'
+import { localizeServerText } from '../shared/serverText'
 
 interface Seal { s: string; r: string; h: string; k: string; p: string; m: string }
 interface Report extends VerifyReport { manifest: { sealed_hash: string | null; current_hash: string | null; ok: boolean; problems: { line_no: number; problem: string }[] } }
@@ -61,7 +62,7 @@ function Result({ id, hash }: { id: string; hash: string }) {
     <Shell back="/v" title={t('verify.title')}>
       {err ? <ErrorBox message={err} /> : !rep ? <Loading /> : (
         <>
-          <Notice tone={all ? 'ok' : 'bad'} title={all ? t('verify.allOk') : rep.overall.ok ? t('verify.partial') : rep.overall.message}>
+          <Notice tone={all ? 'ok' : 'bad'} title={all ? t('verify.allOk') : rep.overall.ok ? t('verify.partial') : localizeServerText(t, rep.overall.message)}>
             <span className="font-mono" dir="ltr">{rep.shipment.ref}</span> · {rep.shipment.trader_name} · {t(`common.state.${rep.shipment.state}`, { defaultValue: rep.shipment.state })}
           </Notice>
           <ul>
@@ -80,7 +81,7 @@ function Result({ id, hash }: { id: string; hash: string }) {
                 <span className="min-w-0">
                 <span className="font-medium">{s.seq + 1}. {t(`customs.step.${s.type}`, { defaultValue: s.type })}{typeof s.payload?.checkpoint === 'string' ? ` · ${t(`customs.step.${s.payload.checkpoint}`, { defaultValue: s.payload.checkpoint })}` : ''}{typeof s.payload?.decision === 'string' ? ` · ${t(`customs.step.${s.payload.decision}`, { defaultValue: s.payload.decision })}` : ''}</span>
                 <span className="block text-muted"><bdi>{s.signer.name}</bdi> · {t(`common.role.${s.signer.role}`, { defaultValue: s.signer.role })} · <span dir="ltr">{when(s.signed_at)}</span></span>
-                {s.problem && <span className="block text-bad">{s.problem}</span>}
+                {s.problem && <span className="block text-bad">{localizeServerText(t, s.problem)}</span>}
                 {s.flags?.map((f) => <span key={f} className="block text-warn">{f}</span>)}
                 </span>
               </li>

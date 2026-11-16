@@ -5,6 +5,7 @@ import { api } from '../../shared/api'
 import { fen, parseYuan } from '../lib/money'
 import { pct, type ManifestLine, type ShipmentDetail } from '../lib/types'
 import { Button, ErrorBox, LinkButton, Loading, Notice, Shell, errText, useLoad } from '../lib/ui'
+import { localizeServerText } from '../../shared/serverText'
 
 /** Every line the AI read, in three languages, with HS code and confidence. Fixing a line is a signed-off edit (audited). */
 export default function Review() {
@@ -56,7 +57,7 @@ export default function Review() {
                     <p className="text-sm text-muted tabular-nums">{l.qty} {l.unit} × {fen(l.unit_price_fen)}</p>
                   </div>
                 </div>
-                {l.value_flag && <Notice tone="warn" title={t('trader.review.valueFlag')}>{l.value_flag}</Notice>}
+                {l.value_flag && <Notice tone="warn" title={t('trader.review.valueFlag')}>{localizeServerText(t, l.value_flag)}</Notice>}
                 {pct(l.hs_confidence) < 70 && <p className="mt-2 text-sm text-warn">{t('trader.review.lowConf')}</p>}
                 {editable && edit !== l.id && <Button kind="quiet" onClick={() => start(l)}>{t('trader.review.edit')}</Button>}
                 {edit === l.id && (

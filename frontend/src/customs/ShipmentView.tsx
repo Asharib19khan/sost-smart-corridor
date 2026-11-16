@@ -8,6 +8,7 @@ import type { Duty, Line, ShipmentDetail, Step, VerifyReport } from './lib/types
 import { useAsync } from './lib/useAsync'
 import { Empty, ErrorBox, Loading, Pill, RiskBadge, Section } from './lib/ui'
 import DecisionPanel from './DecisionPanel'
+import { localizeServerText } from '../shared/serverText'
 
 export default function ShipmentView() {
   const { id = '' } = useParams()
@@ -64,7 +65,7 @@ export default function ShipmentView() {
               <div className="text-sm">
                 <RiskBadge score={s.risk.score} band={s.risk.band} />
                 <ol className="mt-2 list-decimal ps-5">
-                  {s.risk.reasons.slice(0, 3).map((r) => <li key={r}>{r}</li>)}
+                  {s.risk.reasons.slice(0, 3).map((r) => <li key={r}>{localizeServerText(t, r)}</li>)}
                 </ol>
                 {s.risk.reasons.length === 0 ? <p className="mt-2 text-muted">{t('customs.ship.noReasons')}</p> : null}
               </div>
@@ -94,7 +95,7 @@ function IntegrityBanner({ report, error, loading, onRetry }: { report?: VerifyR
       data-testid="integrity-banner"
       className={`flex items-center gap-3 rounded border px-3 py-2 text-sm font-semibold ${ok ? 'border-ok bg-ok-soft text-ok' : 'border-bad bg-bad-soft text-bad'}`}
     >
-      <span>{report.overall.message}</span>
+      <span>{localizeServerText(t, report.overall.message)}</span>
       <button className="ms-auto text-xs font-normal underline" onClick={onRetry} disabled={loading}>
         {loading ? t('common.loading') : t('customs.integrity.recheck')}
       </button>
@@ -124,13 +125,13 @@ function ManifestTable({ lines, problems }: { lines: Line[]; problems: Map<numbe
                 <td>
                   <div className="zh" lang="zh">{l.item_zh ?? '—'}</div>
                   <div className="text-xs text-muted">{l.item_en}</div>
-                  {p ? <div className="mt-1 text-xs font-semibold">{p}</div> : null}
+                  {p ? <div className="mt-1 text-xs font-semibold">{localizeServerText(t, p)}</div> : null}
                 </td>
                 <td className="mono">{l.hs_code ?? '—'}</td>
                 <td className="num">{l.qty} {l.unit ?? ''}</td>
                 <td className="num">{fen(l.unit_price_fen)}</td>
                 <td className="num">{fen(l.total_fen)}</td>
-                <td>{l.value_flag ? <Pill ok={false}>{l.value_flag}</Pill> : <span className="text-muted">—</span>}</td>
+                <td>{l.value_flag ? <Pill ok={false}>{localizeServerText(t, l.value_flag)}</Pill> : <span className="text-muted">—</span>}</td>
               </tr>
             )
           })}
@@ -175,7 +176,7 @@ function ChainTable({ steps }: { steps: Step[] }) {
                 <td>
                   <div className="font-medium">{t(`customs.step.${s.type}`, { defaultValue: s.type })}{s.payload && typeof s.payload.checkpoint === 'string' ? ` · ${t(`customs.step.${s.payload.checkpoint}`, { defaultValue: s.payload.checkpoint })}` : ''}{s.payload && typeof s.payload.decision === 'string' ? ` · ${t(`customs.step.${s.payload.decision}`, { defaultValue: s.payload.decision })}` : ''}</div>
                   {s.flags?.length ? <div className="mt-1 flex flex-wrap gap-1">{s.flags.map((f) => <Pill key={f} ok={false}>{f}</Pill>)}</div> : null}
-                  {s.problem ? <div className="mt-1 text-xs font-semibold">{s.problem}</div> : null}
+                  {s.problem ? <div className="mt-1 text-xs font-semibold">{localizeServerText(t, s.problem)}</div> : null}
                 </td>
                 <td>
                   {s.signer ? <>{s.signer.name} <span className="text-xs text-muted">({s.signer.role})</span>{s.signer.revoked ? <> <Pill ok={false}>{t('customs.ship.revoked')}</Pill></> : null}</> : '—'}

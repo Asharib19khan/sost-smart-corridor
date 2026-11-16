@@ -6,6 +6,7 @@ import { when } from './lib/format'
 import { traderName, type QueueRow } from './lib/types'
 import { useAsync } from './lib/useAsync'
 import { Empty, ErrorBox, Loading, Pill, RiskBadge } from './lib/ui'
+import { localizeServerText } from '../shared/serverText'
 
 const REFRESH_MS = 10_000
 
@@ -70,7 +71,7 @@ export default function Queue() {
                   <td>
                     <Pill ok={r.integrity_ok}>{r.integrity_ok ? t('customs.integrity.verified') : t('customs.integrity.brokenShort')}</Pill>
                   </td>
-                  <td className="max-w-[28rem]">{r.risk.reasons[0] ?? <span className="text-muted">—</span>}</td>
+                  <td className="max-w-[28rem]">{r.risk.reasons[0] ? localizeServerText(t, r.risk.reasons[0]) : <span className="text-muted">—</span>}</td>
                   <td className="num">{when(r.arrived_at)}</td>
                 </tr>
               ))}
