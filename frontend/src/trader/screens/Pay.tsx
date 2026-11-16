@@ -6,7 +6,7 @@ import { fen, paisa } from '../lib/money'
 import { useSession } from '../lib/session'
 import { ensureKey, signAndPost } from '../lib/device'
 import type { ManifestLine, Seller, ShipmentDetail } from '../lib/types'
-import { ErrorBox, Button, LinkButton, Loading, Notice, PinPad, Row, Shell, errText, useLoad } from '../lib/ui'
+import { CheckIcon, ErrorBox, Button, LinkButton, Loading, Notice, PinPad, Row, Shell, errText, useLoad } from '../lib/ui'
 
 interface Wallet { balances: { CNY: number; PKR: number }; label: string }
 
@@ -65,8 +65,8 @@ export default function Pay() {
             {rows.map((r) => (
               <li key={r.id} className="border-b border-line py-4">
                 <div className="mb-3 flex items-baseline justify-between"><span className="font-semibold">{sellerName(r.seller_id)}</span><span dir="ltr" className="font-semibold tabular-nums">{fen(r.amount)}</span></div>
-                {r.paid ? <><p className="font-semibold text-ok">{t('trader.pay.paid')}</p>
-                  <p className={`mt-1 text-sm ${r.confirmed ? 'text-ok' : 'text-warn'}`}>{t(r.confirmed ? 'trader.pay.sellerOk' : 'trader.pay.sellerWait')}</p></>
+                {r.paid ? <><p className="flex items-center gap-1.5 font-semibold text-ok"><CheckIcon />{t('trader.pay.paid')}</p>
+                  <p className={`mt-1 flex items-start gap-1.5 text-sm ${r.confirmed ? 'text-ok' : 'text-warn'}`}>{r.confirmed && <CheckIcon className="mt-0.5" />}{t(r.confirmed ? 'trader.pay.sellerOk' : 'trader.pay.sellerWait')}</p></>
                   : !r.seller_id ? <p className="text-warn">{t('trader.pay.noSeller')}</p>
                     : <Button busy={busy === r.id} disabled={pin.length < 4 || !!busy} onClick={() => void pay(r)}>{t('trader.pay.send', { amount: fen(r.amount) })}</Button>}
               </li>

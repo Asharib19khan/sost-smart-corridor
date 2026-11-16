@@ -25,7 +25,9 @@ export default function Queue() {
     if (q.data) setLastAt(new Date())
   }, [q.data])
 
-  const rows = useMemo(() => [...(q.data ?? [])].sort((a, b) => b.risk.score - a.risk.score), [q.data])
+  // Broken integrity first (a raw DB edit does not update the stored score), then highest risk.
+  const rows = useMemo(() => [...(q.data ?? [])].sort((a, b) =>
+    Number(a.integrity_ok) - Number(b.integrity_ok) || (b.risk.score ?? 0) - (a.risk.score ?? 0)), [q.data])
 
   return (
     <>
@@ -35,8 +37,8 @@ export default function Queue() {
           {t('customs.queue.autoRefresh')}
           {lastAt ? ` · ${t('customs.queue.updated', { time: lastAt.toLocaleTimeString('en-GB') })}` : ''}
         </span>
-        <button className="btn ms-auto" onClick={() => void reload()} disabled={q.loading}>
-          {q.loading ? t('common.loading') : t('customs.queue.refresh')}
+        <button className="btn ms-auto" onClick={() => void reload()} disabled={q.loading} aria-busy={q.loading}>
+          {t('customs.queue.refresh')}
         </button>
       </div>
       {q.error ? <ErrorBox message={q.error} onRetry={() => void reload()} /> : null}

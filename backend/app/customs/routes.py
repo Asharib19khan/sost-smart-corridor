@@ -9,6 +9,7 @@ from ..core.db import CustomsDecision, Event, ManifestLine, Shipment, User, get_
 from ..core.deps import audit, require_role
 from ..integrity.manifest import compare_to_sealed
 from ..integrity.service import prime_chains, verify_chain
+from ..risk import service as risk_svc
 from ..shipments import service as svc
 from ..shipments.state import transition
 
@@ -47,9 +48,17 @@ def queue(_: User = Depends(require_role("customs", "admin")), db: Session = Dep
         last_cp = next((e for e in reversed(evs) if e.type == "checkpoint"), None)
         arrived = last_cp.created_at.isoformat() if last_cp and (last_cp.payload or {}).get("checkpoint") == "sost"             else None
         trader = traders.get(sh.trader_id)
+        ok = verify_chain(db, sh.id)["ok"] and not problems
+        risk = svc.risk_out(sh)
+        if not ok and not any(r.startswith(("Integrity broken", "Manifest changed")) for r in risk["reasons"]):
+            # The stored score predates the break (a raw edit never triggers a recompute): add the integrity
+            # weight here instead of recomputing, which would cost ~10 queries per broken shipment.
+            score = min(100, (risk["score"] or 0) + risk_svc.W_INTEGRITY)
+            risk = {"score": score, "band": risk_svc.band(score),
+                    "reasons": ["Integrity broken: the data changed after it was signed.", *risk["reasons"]][:3]}
         rows.append({"id": sh.id, "ref": sh.ref, "state": sh.state,
                      "trader": {"id": sh.trader_id, "name": trader.name if trader else None},
-                     "risk": svc.risk_out(sh), "integrity_ok": verify_chain(db, sh.id)["ok"] and not problems,
+                     "risk": risk, "integrity_ok": ok,
                      "arrived_at": arrived, "total_fen": int(totals.get(sh.id, 0))})
     # Broken integrity always comes first: the stored score is not updated by a raw database edit.
     rows.sort(key=lambda r: (r["integrity_ok"], r["risk"]["score"] is None, -(r["risk"]["score"] or 0)))

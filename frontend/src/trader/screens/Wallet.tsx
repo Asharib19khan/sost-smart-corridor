@@ -5,12 +5,14 @@ import { api } from '../../shared/api'
 import { fen, paisa } from '../lib/money'
 import { useSession } from '../lib/session'
 import { Button, ErrorBox, Loading, Notice, Row, Shell, errText, useLoad } from '../lib/ui'
+import { when } from '../../customs/lib/format'
 
 interface WalletT {
   label: string; balances: { CNY: number; PKR: number }; credit_limit_paisa: number; duty_paid_paisa: number
   entries: { txn_id: string; kind: string; memo: string; at: string; currency: string; amount_minor: number; shipment_ref: string | null }[]
 }
-interface Trust { score: number; reasons: string[]; credit_limit_paisa: number; formula: string }
+interface TrustReason { delta: number; reason: string; at?: string; shipment_ref?: string | null }
+interface Trust { score: number; reasons: TrustReason[]; credit_limit_paisa: number; formula: string }
 interface Duty { fx_label: string; total_paisa: number; lines: { line_no: number; hs_code: string; value_paisa: number; duty_paisa: number; sales_tax_paisa: number }[] }
 
 export function Wallet() {
@@ -41,14 +43,19 @@ export function Wallet() {
             <div className="mt-8">
               <h2 className="border-b border-fg pb-2 text-lg font-semibold">{t('trader.wallet.trust', { score: tr.data.score })}</h2>
               <p className="py-2 text-sm text-muted" dir="ltr">{tr.data.formula}</p>
-              <ul className="text-sm">{tr.data.reasons.map((r) => <li key={r} className="border-b border-line py-2">{r}</li>)}</ul>
+              <ul className="text-sm">{tr.data.reasons.map((r, i) => (
+                <li key={`${r.at ?? i}-${i}`} className="flex items-baseline justify-between gap-3 border-b border-line py-2">
+                  <span className="min-w-0">{r.reason}{r.shipment_ref && !r.reason.includes(r.shipment_ref) ? <span className="text-muted" dir="ltr"> · {r.shipment_ref}</span> : null}</span>
+                  <span dir="ltr" className={`shrink-0 font-semibold tabular-nums ${r.delta >= 0 ? 'text-ok' : 'text-bad'}`}>{r.delta >= 0 ? '+' : '−'}{Math.abs(r.delta)}</span>
+                </li>
+              ))}</ul>
             </div>
           )}
           <h2 className="mt-8 border-b border-fg pb-2 text-lg font-semibold">{t('trader.wallet.history')}</h2>
           {!w.data.entries.length ? <p className="py-6 text-muted">{t('trader.wallet.none')}</p> : (
             <ul>{w.data.entries.map((e, i) => (
               <li key={`${e.txn_id}${i}`} className="flex items-baseline justify-between gap-3 border-b border-line py-3 text-sm">
-                <span className="min-w-0"><span className="block font-medium">{e.memo || e.kind}</span><span className="text-muted" dir="ltr">{new Date(e.at).toLocaleString()}{e.shipment_ref ? ` · ${e.shipment_ref}` : ''}</span></span>
+                <span className="min-w-0"><span className="block font-medium">{e.memo || e.kind}</span><span className="text-muted" dir="ltr">{when(e.at)}{e.shipment_ref ? ` · ${e.shipment_ref}` : ''}</span></span>
                 <span dir="ltr" className={`tabular-nums ${e.amount_minor < 0 ? 'text-bad' : 'text-ok'}`}>{e.currency === 'CNY' ? fen(e.amount_minor) : paisa(e.amount_minor)}</span>
               </li>
             ))}</ul>

@@ -41,7 +41,7 @@ export function LangSwitch() {
           lang={l.code}
           onClick={() => void i18n.changeLanguage(l.code)}
           aria-pressed={i18n.language === l.code}
-          className={`min-h-12 px-3 text-sm leading-none ${i18n.language === l.code ? 'text-fg font-semibold underline underline-offset-8 decoration-2 decoration-accent' : 'text-muted'}`}
+          className={`min-h-12 whitespace-nowrap px-2 text-sm leading-none sm:px-3 ${i18n.language === l.code ? 'text-fg font-semibold underline underline-offset-8 decoration-2 decoration-accent' : 'text-muted'}`}
         >
           {l.label}
         </button>
@@ -60,15 +60,33 @@ export function Shell({ title, back, children, aside }: { title?: ReactNode; bac
             <Chevron /> <span className="ms-1">{t('trader.back')}</span>
           </Link>
         ) : (
-          <span className="text-sm font-semibold tracking-tight">{t('common.appName')}</span>
+          <span className="min-w-0 truncate text-sm font-semibold tracking-tight">{t('common.appName')}</span>
         )}
-        <div className="flex items-center">{aside}<LangSwitch /></div>
+        <div className="flex shrink-0 items-center whitespace-nowrap">{aside}<LangSwitch /></div>
       </header>
       <main className="mx-auto max-w-2xl px-4 pb-16 pt-6">
         {title && <h1 className="mb-6 text-[1.75rem] font-semibold leading-tight tracking-tight text-balance">{title}</h1>}
         {children}
       </main>
     </div>
+  )
+}
+
+/** Drawn check mark: replaces the ✓ text glyph so it matches the stroke of the other icons. */
+export function CheckIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden className={`inline-block shrink-0 align-[-0.15em] ${className}`}>
+      <path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/** Points toward the reading direction's end (right in English, left in Urdu). */
+export function ChevronEnd({ className = '' }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden className={`shrink-0 rtl:rotate-180 ${className}`}>
+      <path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.75" />
+    </svg>
   )
 }
 

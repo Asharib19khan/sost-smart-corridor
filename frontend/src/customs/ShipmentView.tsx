@@ -173,7 +173,7 @@ function ChainTable({ steps }: { steps: Step[] }) {
               <tr key={s.seq} className={s.ok ? '' : 'row-bad'}>
                 <td className="num">{s.seq + 1}</td>
                 <td>
-                  <div className="font-medium">{s.type}{s.payload && typeof s.payload.checkpoint === 'string' ? ` · ${s.payload.checkpoint}` : ''}{s.payload && typeof s.payload.decision === 'string' ? ` · ${s.payload.decision}` : ''}</div>
+                  <div className="font-medium">{t(`customs.step.${s.type}`, { defaultValue: s.type })}{s.payload && typeof s.payload.checkpoint === 'string' ? ` · ${t(`customs.step.${s.payload.checkpoint}`, { defaultValue: s.payload.checkpoint })}` : ''}{s.payload && typeof s.payload.decision === 'string' ? ` · ${t(`customs.step.${s.payload.decision}`, { defaultValue: s.payload.decision })}` : ''}</div>
                   {s.flags?.length ? <div className="mt-1 flex flex-wrap gap-1">{s.flags.map((f) => <Pill key={f} ok={false}>{f}</Pill>)}</div> : null}
                   {s.problem ? <div className="mt-1 text-xs font-semibold">{s.problem}</div> : null}
                 </td>
@@ -183,10 +183,10 @@ function ChainTable({ steps }: { steps: Step[] }) {
                 <td className="num">{when(s.signed_at)}</td>
                 <td className="num">{when(s.received_at)} <span className="text-xs text-muted">{lag(lagSeconds(s.signed_at, s.received_at))}</span></td>
                 <td className="num">{s.lat != null && s.lng != null ? `${s.lat.toFixed(4)}, ${s.lng.toFixed(4)}` : '—'}</td>
-                <td><Pill ok={s.ok}>{s.ok ? 'ok' : t('customs.integrity.brokenShort')}</Pill></td>
-                <td title={c?.note}>
+                <td className="whitespace-nowrap"><Pill ok={s.ok}>{s.ok ? 'ok' : t('customs.integrity.brokenShort')}</Pill></td>
+                <td title={c?.note} className="whitespace-nowrap">
                   {c ? <Pill ok={c.state === 'na' ? null : c.state === 'ok'}>{c.state === 'ok' ? t('customs.ship.sigOk') : c.state === 'bad' ? t('customs.ship.sigBad') : t('customs.ship.sigNa')}</Pill> : <span className="text-xs text-muted">…</span>}
-                  {c && c.state !== 'ok' ? <div className="mt-1 max-w-56 text-xs text-muted">{c.note}</div> : null}
+                  {c && c.state !== 'ok' ? <div className="mt-1 max-w-56 whitespace-normal text-xs text-muted">{c.note}</div> : null}
                 </td>
               </tr>
             )

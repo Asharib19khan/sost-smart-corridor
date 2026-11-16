@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '../../shared/api'
 import { fen } from '../lib/money'
 import type { ShipmentDetail } from '../lib/types'
-import { ErrorBox, LinkButton, Loading, Notice, RiskDot, Row, Shell, StateLabel, useLoad } from '../lib/ui'
+import { CheckIcon, ChevronEnd, ErrorBox, LinkButton, Loading, Notice, RiskDot, Row, Shell, StateLabel, useLoad } from '../lib/ui'
 
 /** The single next step, derived from the server's allowed_next plus what is on file. */
 export function nextAction(s: ShipmentDetail): { key: string; to: string } | null {
@@ -49,14 +49,50 @@ export default function Hub() {
           {s.risk?.reasons?.length ? (
             <ul className="mt-4 text-sm text-muted">{s.risk.reasons.map((r) => <li key={r} className="py-1">{r}</li>)}</ul>
           ) : null}
-          <nav className="mt-8 grid grid-cols-2 gap-x-6 text-accent sm:grid-cols-3">
-            {(['scan', 'review', 'pay', 'seal', 'track'] as const).map((k) => (
-              <Link key={k} to={k} className="flex min-h-12 items-center border-b border-line">{t(`trader.hub.link.${k}`)}</Link>
-            ))}
-            <Link to="duty" className="flex min-h-12 items-center border-b border-line">{t('trader.hub.link.duty')}</Link>
-          </nav>
+          <Steps s={s} current={act?.key} />
         </>
       )}
     </Shell>
+  )
+}
+
+const ORDER = ['draft', 'paid', 'sealed', 'departed_kashgar', 'crossed_khunjerab', 'arrived_sost', 'cleared']
+const STEPS = ['scan', 'review', 'pay', 'seal', 'track'] as const
+
+/** The journey as a checklist: done steps are ticked, the next one is marked, every step stays reachable. */
+function Steps({ s, current }: { s: ShipmentDetail; current?: string }) {
+  const { t } = useTranslation()
+  const at = s.state === 'held' ? ORDER.indexOf('arrived_sost') : ORDER.indexOf(s.state)
+  const done: Record<(typeof STEPS)[number], boolean> = {
+    scan: s.receipts.some((r) => r.status === 'done'),
+    review: at >= 1,
+    pay: s.payments.length > 0,
+    seal: at >= 2,
+    track: at >= 5,
+  }
+  return (
+    <nav aria-label={t('trader.hub.title')} className="mt-10">
+      <ol>
+        {STEPS.map((k, i) => {
+          const isCur = current === k
+          return (
+            <li key={k} className="relative">
+              {i < STEPS.length - 1 && <span aria-hidden className={`absolute start-[11px] top-9 h-[calc(100%-1.5rem)] w-px ${done[k] ? 'bg-accent' : 'bg-line'}`} />}
+              <Link to={k} aria-current={isCur ? 'step' : undefined}
+                className="group flex min-h-14 items-center gap-4 rounded-md pe-2 hover:bg-sunken">
+                <span aria-hidden className={`grid size-6 shrink-0 place-items-center rounded-full border-2 ${done[k] ? 'border-accent bg-accent text-accent-fg' : isCur ? 'border-accent bg-surface' : 'border-line bg-canvas'}`}>
+                  {done[k] ? <CheckIcon className="size-3.5" /> : isCur ? <span className="size-2 rounded-full bg-accent" /> : null}
+                </span>
+                <span className={`flex-1 ${isCur ? 'font-semibold text-fg' : done[k] ? 'text-fg' : 'text-muted'}`}>{t(`trader.hub.link.${k}`)}</span>
+                <ChevronEnd className="text-muted transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
+              </Link>
+            </li>
+          )
+        })}
+      </ol>
+      <Link to="duty" className="mt-4 flex min-h-12 items-center justify-between border-t border-line pt-1 text-accent">
+        {t('trader.hub.link.duty')}<ChevronEnd />
+      </Link>
+    </nav>
   )
 }

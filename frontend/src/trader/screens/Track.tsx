@@ -7,7 +7,8 @@ import { ensureKey } from '../lib/device'
 import { dropQueued, enqueue, flushQueue, listQueued, postCheckpoint, type QueuedCheckpoint } from '../lib/queue'
 import { useSession } from '../lib/session'
 import type { ShipmentDetail, Step } from '../lib/types'
-import { Button, ErrorBox, Loading, Notice, Shell, errText, useLoad } from '../lib/ui'
+import { CheckIcon, Button, ErrorBox, Loading, Notice, Shell, errText, useLoad } from '../lib/ui'
+import { when } from '../../customs/lib/format'
 
 const POINTS = ['kashgar', 'khunjerab', 'sost'] as const
 // Labelled demo coordinates (inside each geofence) for presenting on a laptop with no GPS at the border.
@@ -72,7 +73,7 @@ export default function Track() {
           <div className="space-y-3">
             {POINTS.map((p) => {
               const done = events.some((e) => e.payload?.checkpoint === p)
-              return <Button key={p} kind={done ? 'secondary' : 'primary'} busy={busy === p} disabled={!!busy || done || !next.some((n) => n.includes(p) || (p === 'kashgar' && n === 'departed_kashgar') || (p === 'khunjerab' && n === 'crossed_khunjerab') || (p === 'sost' && n === 'arrived_sost'))} onClick={() => void mark(p)}>{done ? `✓ ${t(`trader.track.at.${p}`)}` : t(`trader.track.at.${p}`)}</Button>
+              return <Button key={p} kind={done ? 'secondary' : 'primary'} busy={busy === p} disabled={!!busy || done || !next.some((n) => n.includes(p) || (p === 'kashgar' && n === 'departed_kashgar') || (p === 'khunjerab' && n === 'crossed_khunjerab') || (p === 'sost' && n === 'arrived_sost'))} onClick={() => void mark(p)}>{done ? <span className="inline-flex items-center gap-2"><CheckIcon className="text-ok" />{t(`trader.track.at.${p}`)}</span> : t(`trader.track.at.${p}`)}</Button>
             })}
           </div>
           <label className="mt-4 flex min-h-12 items-center gap-3 text-sm"><input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} className="size-5" />{t('trader.track.demoLoc')}</label>
@@ -89,7 +90,7 @@ export default function Track() {
             <ul>{events.map((e) => (
               <li key={e.seq} className="border-b border-line py-3">
                 <p className="font-semibold">{t(`trader.track.at.${String(e.payload?.checkpoint)}`)}</p>
-                <p className="text-sm text-muted" dir="ltr">{new Date(e.signed_at).toLocaleString()} · {e.lat?.toFixed(4)}, {e.lng?.toFixed(4)}</p>
+                <p className="text-sm text-muted" dir="ltr">{when(e.signed_at)} · {e.lat?.toFixed(4)}, {e.lng?.toFixed(4)}</p>
                 {e.flags?.includes('outside_geofence') && <p className="text-sm font-semibold text-warn">{t('trader.track.outside')}</p>}
               </li>
             ))}</ul>

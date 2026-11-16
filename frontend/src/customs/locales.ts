@@ -11,7 +11,8 @@ const en = {
     sellerConfirm: 'Seller confirmation', confirmedBy: 'Confirmed by {{name}}', notConfirmed: 'Not confirmed', receiptAlt: 'Receipt {{id}}',
     dutyCol: 'Duty', salesTax: 'Sales tax', dutyTotal: 'Total payable', fx: 'Sandbox rate: 1 CNY = {{rate}} PKR',
   },
-  ui: { navQueue: 'Queue', navVerify: 'Verify', navAdmin: 'Admin', signOut: 'Sign out', switchUser: 'Sign in as a different user', noAccessTitle: 'No access', noAccess: '{{name}} ({{role}}) cannot open this page. Sign in as a customs officer.' },
+  step: { payment: 'Payment', manifest_sealed: 'Seal applied', seller_confirmed: 'Seller confirmed', checkpoint: 'Checkpoint', customs_decision: 'Customs decision', kashgar: 'Kashgar', khunjerab: 'Khunjerab', sost: 'Sost', approve: 'approved', hold: 'held', request_docs: 'documents requested' },
+  ui: { navQueue: 'Queue',navVerify: 'Verify', navAdmin: 'Admin', signOut: 'Sign out', switchUser: 'Sign in as a different user', noAccessTitle: 'No access', noAccess: '{{name}} ({{role}}) cannot open this page. Sign in as a customs officer.' },
   decide: { title: 'Sign a decision', approve: 'Approve — clear', hold: 'Hold', docs: 'Request documents', reason: 'Reason (shown to the trader)', reasonNeeded: 'Write a reason first.', needKey: 'This browser has no signing key yet.', signing: 'Signing in this browser…', done: 'Decision signed and recorded.', closed: 'Decision is only possible once the shipment is at Sost or held.', current: 'Current state' },
 }
 const ur: typeof en = {
@@ -26,7 +27,8 @@ const ur: typeof en = {
     sellerConfirm: 'بیچنے والے کی تصدیق', confirmedBy: '{{name}} نے تصدیق کی', notConfirmed: 'تصدیق نہیں ہوئی', receiptAlt: 'رسید {{id}}',
     dutyCol: 'ڈیوٹی', salesTax: 'سیلز ٹیکس', dutyTotal: 'کل واجب الادا', fx: 'سینڈ باکس ریٹ: 1 یوآن = {{rate}} روپے',
   },
-  ui: { navQueue: 'قطار', navVerify: 'تصدیق', navAdmin: 'ایڈمن', signOut: 'سائن آؤٹ', switchUser: 'دوسرے صارف سے سائن اِن کریں', noAccessTitle: 'رسائی نہیں', noAccess: '{{name}} ({{role}}) یہ صفحہ نہیں کھول سکتے۔ کسٹمز افسر کے طور پر سائن اِن کریں۔' },
+  step: { payment: 'ادائیگی', manifest_sealed: 'مہر لگی', seller_confirmed: 'بیچنے والے کی تصدیق', checkpoint: 'چیک پوائنٹ', customs_decision: 'کسٹمز کا فیصلہ', kashgar: 'کاشغر', khunjerab: 'خنجراب', sost: 'سوست', approve: 'منظور', hold: 'روکا گیا', request_docs: 'دستاویزات طلب' },
+  ui: { navQueue: 'قطار',navVerify: 'تصدیق', navAdmin: 'ایڈمن', signOut: 'سائن آؤٹ', switchUser: 'دوسرے صارف سے سائن اِن کریں', noAccessTitle: 'رسائی نہیں', noAccess: '{{name}} ({{role}}) یہ صفحہ نہیں کھول سکتے۔ کسٹمز افسر کے طور پر سائن اِن کریں۔' },
   decide: { title: 'فیصلے پر دستخط', approve: 'منظور — کلیئر', hold: 'روکیں', docs: 'دستاویزات مانگیں', reason: 'وجہ (تاجر کو دکھائی جائے گی)', reasonNeeded: 'پہلے وجہ لکھیں۔', needKey: 'اس براؤزر میں ابھی دستخطی کلید نہیں۔', signing: 'اس براؤزر میں دستخط ہو رہے ہیں…', done: 'فیصلے پر دستخط ہو گئے اور درج ہو گیا۔', closed: 'فیصلہ صرف تب ہو سکتا ہے جب کھیپ سوست پہنچ جائے یا روکی گئی ہو۔', current: 'موجودہ حالت' },
 }
 const zh: typeof en = {
@@ -41,7 +43,8 @@ const zh: typeof en = {
     sellerConfirm: '卖家确认', confirmedBy: '{{name}} 已确认', notConfirmed: '未确认', receiptAlt: '收据 {{id}}',
     dutyCol: '关税', salesTax: '销售税', dutyTotal: '应缴合计', fx: '沙盒汇率：1 人民币 = {{rate}} 卢比',
   },
-  ui: { navQueue: '队列', navVerify: '验证', navAdmin: '管理', signOut: '退出', switchUser: '换用户登录', noAccessTitle: '无权限', noAccess: '{{name}}（{{role}}）无法打开此页面。请以海关官员身份登录。' },
+  step: { payment: '付款', manifest_sealed: '已封签', seller_confirmed: '卖家已确认', checkpoint: '检查站', customs_decision: '海关决定', kashgar: '喀什', khunjerab: '红其拉甫', sost: '苏斯特', approve: '放行', hold: '扣留', request_docs: '要求补充文件' },
+  ui: { navQueue: '队列',navVerify: '验证', navAdmin: '管理', signOut: '退出', switchUser: '换用户登录', noAccessTitle: '无权限', noAccess: '{{name}}（{{role}}）无法打开此页面。请以海关官员身份登录。' },
   decide: { title: '签署决定', approve: '批准——放行', hold: '扣留', docs: '要求补充文件', reason: '原因（商人可见）', reasonNeeded: '请先填写原因。', needKey: '此浏览器还没有签名密钥。', signing: '正在本浏览器中签名…', done: '决定已签署并记录。', closed: '货物到达苏斯特或被扣留后才能做决定。', current: '当前状态' },
 }
 export const customsLocales = { en: { customs: en }, ur: { customs: ur }, zh: { customs: zh } }
