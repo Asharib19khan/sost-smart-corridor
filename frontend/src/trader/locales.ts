@@ -1,5 +1,6 @@
 // Strings for the trader area. Keys namespaced "trader.*". ur/en/zh kept in sync (typed against en).
 const en = {
+  role: { trader: 'Trader', driver: 'Driver', customs: 'Customs officer', admin: 'Admin' },
   back: 'Back', risk: 'Risk',
   home: { hello: 'Welcome', new: 'Start a new shipment', mine: 'My shipments', assigned: 'Assigned shipments', empty: 'No shipments yet. Start one when you have a receipt from Kashgar.', emptyDriver: 'No shipments assigned to you yet.', wallet: 'Wallet', logout: 'Sign out' },
   hub: {
@@ -22,6 +23,7 @@ const en = {
   duty: { title: 'Duty and tax', indicative: 'Indicative estimate', total: 'Total payable', pay: 'Pay duty (sandbox)', paid: 'Duty paid.' },
 }
 const ur: typeof en = {
+  role: { trader: 'تاجر', driver: 'ڈرائیور', customs: 'کسٹمز افسر', admin: 'ایڈمن' },
   back: 'واپس', risk: 'خطرہ',
   home: { hello: 'خوش آمدید', new: 'نئی کھیپ شروع کریں', mine: 'میری کھیپیں', assigned: 'آپ کو سونپی گئی کھیپیں', empty: 'ابھی کوئی کھیپ نہیں۔ کاشغر کی رسید ہو تو شروع کریں۔', emptyDriver: 'ابھی آپ کو کوئی کھیپ نہیں سونپی گئی۔', wallet: 'والیٹ', logout: 'سائن آؤٹ' },
   hub: {
@@ -44,6 +46,7 @@ const ur: typeof en = {
   duty: { title: 'ڈیوٹی اور ٹیکس', indicative: 'اندازاً تخمینہ', total: 'کل واجب الادا', pay: 'ڈیوٹی ادا کریں (سینڈ باکس)', paid: 'ڈیوٹی ادا ہو گئی۔' },
 }
 const zh: typeof en = {
+  role: { trader: '商人', driver: '司机', customs: '海关官员', admin: '管理员' },
   back: '返回', risk: '风险',
   home: { hello: '欢迎', new: '开始新货运', mine: '我的货运', assigned: '分配给我的货运', empty: '还没有货运。拿到喀什的收据后开始。', emptyDriver: '还没有分配给你的货运。', wallet: '钱包', logout: '退出' },
   hub: {

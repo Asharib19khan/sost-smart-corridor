@@ -21,6 +21,7 @@ from sqlalchemy import (
     event,
     text,
 )
+from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 from .config import settings
@@ -32,6 +33,19 @@ def now() -> datetime:
 
 def uid() -> str:
     return uuid4().hex
+
+
+class UTCDateTime(TypeDecorator):
+    """Timestamps are always UTC. SQLite drops the zone on read, so put it back: every API then emits '...+00:00'."""
+
+    impl = DateTime(timezone=True)
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):  # noqa: ANN001
+        return value.astimezone(UTC) if value is not None and value.tzinfo else value
+
+    def process_result_value(self, value, dialect):  # noqa: ANN001
+        return value.replace(tzinfo=UTC) if value is not None and value.tzinfo is None else value
 
 
 class Base(DeclarativeBase):
@@ -49,8 +63,8 @@ class User(Base):
     pin_hash: Mapped[str | None] = mapped_column(String(100))
     status: Mapped[str] = mapped_column(String(16), default="active")  # active | locked | pending
     failed_logins: Mapped[int] = mapped_column(Integer, default=0)
-    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    locked_until: Mapped[datetime | None] = mapped_column(UTCDateTime())
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class DeviceKey(Base):
@@ -59,8 +73,8 @@ class DeviceKey(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
     public_key: Mapped[str] = mapped_column(String(64))  # base64url raw 32 bytes
     label: Mapped[str] = mapped_column(String(80), default="browser")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
-    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
+    revoked_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
 
 
 class Seller(Base):
@@ -83,8 +97,8 @@ class Shipment(Base):
     manifest_hash: Mapped[str | None] = mapped_column(String(64))
     risk_score: Mapped[int | None] = mapped_column(Integer)
     risk_reasons: Mapped[list | None] = mapped_column(JSON)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now, onupdate=now)
 
 
 class Receipt(Base):
@@ -100,7 +114,7 @@ class Receipt(Base):
     status: Mapped[str] = mapped_column(String(16), default="processing")  # processing | done | failed
     flags: Mapped[list | None] = mapped_column(JSON)  # e.g. ["sum_mismatch", "injection_text"]
     error: Mapped[str | None] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class ManifestLine(Base):
@@ -142,7 +156,7 @@ class Event(Base):
     server_sig: Mapped[str] = mapped_column(String(100))  # server counter-sig over hash+received_at
     nonce: Mapped[str] = mapped_column(String(64))
     signed_at: Mapped[str] = mapped_column(String(40))  # device clock, ISO, inside envelope
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)  # received_at
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)  # received_at
     flags: Mapped[list | None] = mapped_column(JSON)  # e.g. ["outside_geofence"]
 
 
@@ -159,7 +173,7 @@ class LedgerTxn(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=uid)
     kind: Mapped[str] = mapped_column(String(24))  # topup | seller_payment | duty | fx
     memo: Mapped[str] = mapped_column(String(200), default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class LedgerEntry(Base):
@@ -182,7 +196,7 @@ class Payment(Base):
     amount_fen: Mapped[int] = mapped_column(Integer)
     txn_id: Mapped[str] = mapped_column(ForeignKey("ledger_txns.id"))
     seller_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class CustomsDecision(Base):
@@ -193,7 +207,7 @@ class CustomsDecision(Base):
     decision: Mapped[str] = mapped_column(String(16))  # approve | hold | request_docs
     reason: Mapped[str] = mapped_column(String(400), default="")
     event_id: Mapped[str] = mapped_column(ForeignKey("events.id"))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class TrustScore(Base):
@@ -201,7 +215,7 @@ class TrustScore(Base):
     trader_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
     score: Mapped[int] = mapped_column(Integer, default=50)
     reasons: Mapped[list] = mapped_column(JSON, default=list)  # [{delta, reason, at, shipment_ref}]
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now, onupdate=now)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now, onupdate=now)
 
 
 class AuditLog(Base):
@@ -212,14 +226,14 @@ class AuditLog(Base):
     target: Mapped[str | None] = mapped_column(String(64))
     detail: Mapped[dict | None] = mapped_column(JSON)
     ip: Mapped[str | None] = mapped_column(String(64))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=now)
 
 
 class OtpCode(Base):
     __tablename__ = "otp_codes"
     phone: Mapped[str] = mapped_column(String(32), primary_key=True)
     code_hash: Mapped[str] = mapped_column(String(100))
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime())
     attempts: Mapped[int] = mapped_column(Integer, default=0)
 
 
@@ -227,7 +241,7 @@ class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
     id: Mapped[str] = mapped_column(String(64), primary_key=True)  # sha256 of token
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
-    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(UTCDateTime())
     used: Mapped[bool] = mapped_column(Boolean, default=False)
 
 

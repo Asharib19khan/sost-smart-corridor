@@ -70,14 +70,13 @@ function Result({ id, hash }: { id: string; hash: string }) {
             <Check ok={rep.manifest.ok} label={rep.manifest.ok ? t('verify.manifestOk') : t('verify.manifestBad', { n: rep.manifest.problems.map((p) => p.line_no).join(', ') })} />
             <Check ok={rep.chain.ok} label={rep.chain.ok ? t('verify.chainOk', { n: rep.chain.steps.length }) : t('verify.chainBad', { n: rep.chain.broken_at })} />
           </ul>
-          {!rep.overall.ok && <p className="mt-3 font-semibold text-bad">{rep.overall.message}</p>}
           {seal && <p className="mt-4 text-sm text-muted">{t('verify.sealed')}: <Mono>{short(seal.h, 16)}</Mono></p>}
           <h2 className="mt-8 border-b border-fg pb-2 text-lg font-semibold">{t('verify.history')}</h2>
           <ul>
             {rep.chain.steps.map((s) => (
               <li key={s.seq} className="border-b border-line py-3 text-sm">
                 <span className={s.ok ? 'text-ok' : 'font-semibold text-bad'}>{s.ok ? '✓' : '✗'}</span>{' '}
-                <span className="font-medium">{s.seq}. {s.type}{typeof s.payload?.checkpoint === 'string' ? ` · ${s.payload.checkpoint}` : ''}</span>
+                <span className="font-medium">{s.seq + 1}. {s.type}{typeof s.payload?.checkpoint === 'string' ? ` · ${s.payload.checkpoint}` : ''}</span>
                 <span className="block text-muted" dir="ltr">{s.signer.name} ({s.signer.role}) · {new Date(s.signed_at).toLocaleString()}</span>
                 {s.problem && <span className="block text-bad">{s.problem}</span>}
                 {s.flags?.map((f) => <span key={f} className="block text-warn">{f}</span>)}

@@ -24,7 +24,14 @@ function SellerPage() {
 
   // The shop speaks Mandarin first; keep their own choice if they made one.
   useEffect(() => {
-    try { if (!localStorage.getItem('sost.lang')) void i18n.changeLanguage('zh') } catch { /* ignore */ }
+    let temp = false
+    try { temp = !localStorage.getItem('sost.lang') } catch { /* ignore */ }
+    if (temp) void i18n.changeLanguage('zh')
+    // Default only: leaving the page forgets it, so it never overrides another user's choice on a shared browser.
+    return () => {
+      if (!temp) return
+      void i18n.changeLanguage('en').then(() => { try { localStorage.removeItem('sost.lang') } catch { /* ignore */ } })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

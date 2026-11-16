@@ -50,6 +50,8 @@ def build_report(db: Session, shipment: Shipment) -> dict:
             "signer": {"name": signer.name if signer else None, "role": signer.role if signer else None,
                        "key_id": ev.signer_key_id, "revoked": bool(key and key.revoked_at)},
             "lat": ev.lat, "lng": ev.lng, "flags": ev.flags or [], "payload": ev.payload,
+            # So any browser can re-hash and re-verify the signature itself, without trusting this server.
+            "envelope": ev.envelope, "signature": ev.signature, "hash": ev.hash,
         })
 
     sealed_ev = next((e for e in reversed(events) if e.type == "manifest_sealed"), None)
@@ -67,7 +69,7 @@ def build_report(db: Session, shipment: Shipment) -> dict:
         overall = {"ok": False, "message": f"Integrity: broken at step {n + 1} — {steps[n]['problem']}"}
     elif not manifest["ok"]:
         p = manifest["problems"][0]
-        what = f"line {p['line_no']} {p['problem'][0].lower()}{p['problem'][1:]}" if p["line_no"] \
+        what = f"line {p['line_no']} {p['problem'].removeprefix('Line ')}" if p["line_no"] \
             else p["problem"].lower()
         more = f" (+{len(manifest['problems']) - 1} more)" if len(manifest["problems"]) > 1 else ""
         overall = {"ok": False,
