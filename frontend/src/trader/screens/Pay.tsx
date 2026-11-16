@@ -29,8 +29,8 @@ export default function Pay() {
     if (!s) return []
     return s.receipts.map((r) => {
       const amount = (s.lines as ManifestLine[]).filter((l) => l.receipt_id === r.id).reduce((a, l) => a + l.total_fen, 0)
-      const paid = s.payments.some((p) => p.seller_id === r.seller_id && p.amount_fen === amount)
-      return { ...r, amount, paid }
+      const pay = s.payments.find((p) => p.seller_id === r.seller_id && p.amount_fen === amount)
+      return { ...r, amount, paid: !!pay, confirmed: !!pay?.seller_confirmed }
     }).filter((r) => r.amount > 0)
   }, [ship.data])
 
@@ -65,7 +65,8 @@ export default function Pay() {
             {rows.map((r) => (
               <li key={r.id} className="border-b border-line py-4">
                 <div className="mb-3 flex items-baseline justify-between"><span className="font-semibold">{sellerName(r.seller_id)}</span><span dir="ltr" className="font-semibold tabular-nums">{fen(r.amount)}</span></div>
-                {r.paid ? <p className="font-semibold text-ok">{t('trader.pay.paid')}</p>
+                {r.paid ? <><p className="font-semibold text-ok">{t('trader.pay.paid')}</p>
+                  <p className={`mt-1 text-sm ${r.confirmed ? 'text-ok' : 'text-warn'}`}>{t(r.confirmed ? 'trader.pay.sellerOk' : 'trader.pay.sellerWait')}</p></>
                   : !r.seller_id ? <p className="text-warn">{t('trader.pay.noSeller')}</p>
                     : <Button busy={busy === r.id} disabled={pin.length < 4 || !!busy} onClick={() => void pay(r)}>{t('trader.pay.send', { amount: fen(r.amount) })}</Button>}
               </li>

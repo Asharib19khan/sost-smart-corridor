@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..core.db import CustomsDecision, DeviceKey, Event, ManifestLine, Payment, Receipt, Shipment, User
+from ..core.db import CustomsDecision, DeviceKey, Event, ManifestLine, Payment, Receipt, Seller, Shipment, User
 from ..integrity.manifest import compare_to_sealed, manifest_doc, manifest_hash
 from ..integrity.service import ChainError, append_event, verify_chain
 from .state import allowed_next
@@ -137,6 +137,7 @@ def detail(db: Session, sh: Shipment) -> dict:
         "lines": [{f: getattr(ln, f) for f in LINE_OUT} for ln in lines],
         "receipts": [{"id": r.id, "status": r.status, "seller_id": r.seller_id} for r in receipts],
         "payments": [{"id": p.id, "seller_id": p.seller_id, "amount_fen": p.amount_fen,
+                      "seller_name": (sl.shop_name_en if (sl := db.get(Seller, p.seller_id)) else None),
                       "seller_confirmed": p.seller_confirmed,
                       "created_at": p.created_at.isoformat() if p.created_at else None} for p in payments],
         "decisions": [{"decision": d.decision, "reason": d.reason, "officer_id": d.officer_id,

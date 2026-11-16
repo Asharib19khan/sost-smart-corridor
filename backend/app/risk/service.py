@@ -9,6 +9,7 @@ from ..integrity import service as integrity
 from ..trust import service as trust
 
 W_INTEGRITY, W_PAYMENT, W_VALUE_LINE, W_VALUE_MAX, W_GEOFENCE, W_NEW, W_TRUSTED = 60, 25, 15, 30, 15, 10, -15
+W_UNCONFIRMED = 10
 
 
 def yuan(fen: int) -> str:
@@ -48,6 +49,12 @@ def compute(db: Session, shipment: Shipment) -> tuple[int, str, list[str]]:
     paid, declared, pct = payment_mismatch(db, shipment)
     if paid > 0 and declared > 0 and abs(paid - declared) * 100 > 2 * declared:
         items.append((W_PAYMENT, f"Paid {yuan(paid)} but declared {yuan(declared)} ({pct}% gap)."))
+
+    unconfirmed = list(db.scalars(select(Payment).where(Payment.shipment_id == shipment.id,
+                                                        Payment.seller_confirmed.is_(False))))
+    if unconfirmed:
+        items.append((W_UNCONFIRMED, f"Seller has not confirmed {len(unconfirmed)} payment(s): "
+                                     "the goods and amount are signed by the trader only."))
 
     flagged = list(db.scalars(select(ManifestLine).where(
         ManifestLine.shipment_id == shipment.id, ManifestLine.value_flag.is_not(None)).order_by(ManifestLine.line_no)))

@@ -4,7 +4,7 @@ import { Route, Routes, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../shared/api'
 import { fen } from '../trader/lib/money'
-import { ensureKey, signAndPost } from '../trader/lib/device'
+import { ensureKey, isKeyProblem, reRegister, signAndPost } from '../trader/lib/device'
 import { Button, ErrorBox, Loading, Notice, Row, Shell, errText, useLoad } from '../trader/lib/ui'
 
 interface Pending {
@@ -39,8 +39,8 @@ function SellerPage() {
     setBusy(p.shipment_id); setErr(null); setDone(null)
     try {
       const uid = `seller:${token}`
-      const key = await ensureKey(uid, (k) => api(`/seller-link/${token}/key`, { body: { public_key: k.publicKey }, auth: false }))
-      await signAndPost({
+      const register = (k: { publicKey: string }) => api(`/seller-link/${token}/key`, { body: { public_key: k.publicKey }, auth: false })
+      const send = (key: Awaited<ReturnType<typeof ensureKey>>) => signAndPost({
         key, shipmentId: p.shipment_id, type: 'seller_confirmed', path: `/seller-link/${token}/confirm`, auth: false,
         payload: { manifest_hash: p.manifest.manifest_hash, receipt_id: p.receipt_ids[0] ?? '', amount_fen: p.amount_fen },
         head: async () => {
@@ -48,6 +48,13 @@ function SellerPage() {
           return l.pending.find((x) => x.shipment_id === p.shipment_id)!.chain_head
         },
       })
+      try {
+        await send(await ensureKey(uid, register))
+      } catch (e) {
+        // The key saved on this phone is unknown to the server (e.g. demo data reset): make a new one and retry once.
+        if (!isKeyProblem(e)) throw e
+        await send(await reRegister(uid, register))
+      }
       setDone(p.ref)
       await link.reload()
     } catch (e) { setErr(errText(e)) } finally { setBusy(null) }

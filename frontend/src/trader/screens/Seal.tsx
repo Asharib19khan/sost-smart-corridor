@@ -8,6 +8,15 @@ import { ensureKey, signAndPost } from '../lib/device'
 import { useSession } from '../lib/session'
 import { short } from '../lib/money'
 import type { Manifest, ShipmentDetail } from '../lib/types'
+
+// navigator.clipboard only exists on https/localhost; phones on the LAN demo use plain http, so fall back to execCommand.
+async function copyText(text: string): Promise<boolean> {
+  try { await navigator.clipboard.writeText(text); return true } catch { /* fall through */ }
+  const ta = document.createElement('textarea')
+  ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'
+  document.body.appendChild(ta); ta.select()
+  try { return document.execCommand('copy') } catch { return false } finally { ta.remove() }
+}
 import { Button, ErrorBox, LinkButton, Loading, Mono, Notice, Shell, errText, useLoad } from '../lib/ui'
 
 /** Seal = sign the exact manifest hash. After this, changing any line breaks the seal. */
@@ -20,6 +29,7 @@ export default function Seal() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [png, setPng] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const seal = ship.data?.seal ?? null
   // VITE_PUBLIC_ORIGIN lets a laptop on localhost still print QR codes that visitors' phones can open.
   const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
@@ -52,7 +62,14 @@ export default function Seal() {
             <>
               <Notice tone="ok" title={t('trader.seal.done')}>{t('trader.seal.doneNote')}</Notice>
               {png && <img src={png} alt={t('trader.seal.qrAlt')} width={300} height={300} className="mx-auto my-6 border border-line bg-surface p-2" />}
-              {url && <p className="break-all text-center text-sm text-muted" dir="ltr">{url.split('#')[0]}</p>}
+              {url && (
+                <p className="text-center">
+                  <button type="button" className="min-h-11 px-4 text-sm font-semibold text-accent underline"
+                    onClick={() => void copyText(url).then(setCopied)}>
+                    {copied ? t('trader.seal.copied') : t('trader.seal.copy')}
+                  </button>
+                </p>
+              )}
               <div className="mt-6"><LinkButton to={`/t/s/${id}/track`}>{t('trader.hub.do.track')}</LinkButton></div>
             </>
           ) : ship.data?.state === 'paid' ? (

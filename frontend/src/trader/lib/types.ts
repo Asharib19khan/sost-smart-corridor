@@ -8,7 +8,7 @@ export interface ShipmentDetail extends ShipmentSummary {
   seal: string | null
   lines: ManifestLine[]
   receipts: { id: string; status: string; seller_id: string | null }[]
-  payments: { id?: string; amount_fen?: number; seller_id?: string }[]
+  payments: { id?: string; amount_fen?: number; seller_id?: string; seller_confirmed?: boolean }[]
   events: unknown[]
   allowed_next: string[]
 }

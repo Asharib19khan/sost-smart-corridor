@@ -1,8 +1,8 @@
 export const fen = (v: number | null | undefined) =>
   v == null ? '—' : `¥${(v / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-export const paisa = (v: number | null | undefined) =>
-  v == null ? '—' : `Rs ${(v / 100).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+// Whole rupees, same as the trader app.
+export { paisa } from '../../trader/lib/money'
 
 export function when(iso: string | null | undefined): string {
   if (!iso) return '—'
