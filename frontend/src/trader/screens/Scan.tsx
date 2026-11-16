@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../../shared/api'
 import { fen } from '../lib/money'
@@ -82,7 +82,6 @@ export default function Scan() {
         ))}</ul>
       )}
       {!!ship.data?.lines.length && <div className="mt-6"><LinkButton to={`/t/s/${id}/review`}>{t('trader.scan.next')}</LinkButton></div>}
-      <p className="mt-4 text-sm text-muted"><Link to={`/t/s/${id}`} className="underline">{t('trader.back')}</Link></p>
     </Shell>
   )
 }
