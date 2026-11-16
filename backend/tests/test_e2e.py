@@ -12,19 +12,19 @@ _tmp = tempfile.mkdtemp(prefix="sost_e2e_")
 os.environ["SOST_DATABASE_URL"] = os.environ.get("SOST_E2E_DATABASE_URL") or f"sqlite:///{Path(_tmp, 'e2e.db').as_posix()}"
 os.environ["SOST_UPLOAD_DIR"] = str(Path(_tmp, "uploads"))
 
-import base64  # noqa: E402
-import json  # noqa: E402
-import secrets  # noqa: E402
-from datetime import UTC, datetime  # noqa: E402
+import base64
+import json
+import secrets
+from datetime import UTC, datetime
 
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from nacl.signing import SigningKey  # noqa: E402
+import pytest
+from fastapi.testclient import TestClient
+from nacl.signing import SigningKey
 
-from app.core.canonical import canonical_hash  # noqa: E402
-from app.core.crypto import b64u, b64u_dec, key_fingerprint, verify  # noqa: E402
-from app.main import app  # noqa: E402
-from app.ocr import readers  # noqa: E402
+from app.core.canonical import canonical_hash
+from app.core.crypto import b64u, b64u_dec, key_fingerprint, verify
+from app.main import app
+from app.ocr import readers
 
 RECEIPT = Path(__file__).resolve().parents[2] / "demo" / "receipts" / "r3.png"
 
@@ -147,7 +147,7 @@ def test_full_story(c):
     token = c.get("/admin/users", headers=admin.h).status_code  # admin reachable
     assert token == 200
     seller_actor = Actor(c)
-    from app.core.db import SessionLocal, Seller
+    from app.core.db import Seller, SessionLocal
     with SessionLocal() as db:
         tok = db.get(Seller, link["id"]).link_token
     r = c.post(f"/seller-link/{tok}/key", json={"public_key": seller_actor.pub})
@@ -195,7 +195,9 @@ def test_full_story(c):
     rep = c.get(f"/verify/{sid}").json()
     assert not rep["overall"]["ok"]
     assert rep["manifest"]["problems"][0]["line_no"] == 2, rep["manifest"]
-    assert c.get("/customs/queue", headers=officer.h).json()[0]["id"] == sid  # now top risk
+    q = c.get("/customs/queue", headers=officer.h).json()
+    assert not next(x for x in q if x["id"] == sid)["integrity_ok"]
+    assert all(not x["integrity_ok"] for x in q[:q.index(next(x for x in q if x["id"] == sid)) + 1])  # broken first
     r = c.post("/admin/tamper", headers=admin.h, json={"action": "delete_event", "shipment_id": sid, "seq": 3})
     assert r.status_code == 200, r.text
     rep = c.get(f"/verify/{sid}").json()

@@ -6,7 +6,17 @@ from fastapi import HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from ..core.db import CustomsDecision, DeviceKey, Event, ManifestLine, Payment, Receipt, Seller, Shipment, User
+from ..core.db import (
+    CustomsDecision,
+    DeviceKey,
+    Event,
+    ManifestLine,
+    Payment,
+    Receipt,
+    Seller,
+    Shipment,
+    User,
+)
 from ..integrity.manifest import compare_to_sealed, manifest_doc, manifest_hash
 from ..integrity.service import ChainError, append_event, verify_chain
 from .state import allowed_next

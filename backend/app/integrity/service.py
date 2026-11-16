@@ -18,10 +18,9 @@ Envelope (v1), identical for browser-signed events and the future IoT e-seal:
     server_sig = ed25519_server(f"{hash}|{received_at_iso}") — proves when the server saw it.
 """
 
+import copy
 from dataclasses import dataclass
 from datetime import UTC, datetime
-
-import copy
 
 from sqlalchemy import event, select
 from sqlalchemy.orm import Session

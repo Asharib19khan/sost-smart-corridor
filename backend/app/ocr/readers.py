@@ -72,7 +72,7 @@ Reply with exactly one JSON array, same order and length as the items, no other 
 
 def _extract_json(text: str):
     text = text.strip()
-    fence = re.search(r"```(?:json)?\s*(.*?)```", text, re.S)
+    fence = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL)
     if fence:
         text = fence.group(1).strip()
     for opener, closer in (("{", "}"), ("[", "]")):
@@ -98,7 +98,7 @@ def run_claude(prompt: str, add_dir: Path | None = None) -> str:
     """Run the local Claude Code CLI headless; return the `result` text. Kills on timeout."""
     with tempfile.TemporaryDirectory(prefix="sost_ocr_", ignore_cleanup_errors=True) as cwd:
         try:
-            proc = subprocess.run(  # noqa: S603 - fixed argv, no shell
+            proc = subprocess.run(
                 claude_cmd(prompt, add_dir), cwd=cwd, capture_output=True, text=True,
                 encoding="utf-8", timeout=settings.ocr_timeout_s, stdin=subprocess.DEVNULL,
             )

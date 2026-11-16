@@ -21,8 +21,8 @@ from sqlalchemy import (
     event,
     text,
 )
-from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.types import TypeDecorator
 
 from .config import settings
 
@@ -41,10 +41,10 @@ class UTCDateTime(TypeDecorator):
     impl = DateTime(timezone=True)
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):  # noqa: ANN001
+    def process_bind_param(self, value, dialect):
         return value.astimezone(UTC) if value is not None and value.tzinfo else value
 
-    def process_result_value(self, value, dialect):  # noqa: ANN001
+    def process_result_value(self, value, dialect):
         return value.replace(tzinfo=UTC) if value is not None and value.tzinfo is None else value
 
 
@@ -268,7 +268,7 @@ SessionLocal = sessionmaker(engine, expire_on_commit=False)
 if settings.database_url.startswith("sqlite"):
 
     @event.listens_for(engine, "connect")
-    def _sqlite_pragmas(dbapi_conn, _):  # noqa: ANN001
+    def _sqlite_pragmas(dbapi_conn, _):
         cur = dbapi_conn.cursor()
         cur.execute("PRAGMA foreign_keys=ON")
         cur.execute("PRAGMA journal_mode=WAL")
@@ -292,7 +292,7 @@ APPEND_ONLY_POSTGRES = [
 ]
 
 
-def _postgres_hardening(conn) -> None:  # noqa: ANN001
+def _postgres_hardening(conn) -> None:
     """Supabase exposes tables over a public REST API. Row-level security with NO policies means the publishable key
     can read nothing; this server connects as the owner role, which bypasses RLS."""
     for stmt in APPEND_ONLY_POSTGRES:

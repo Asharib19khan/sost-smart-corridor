@@ -13,10 +13,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-import app.main  # noqa: E402,F401  (imports every module, so all tables are in the metadata)
-from app import seed  # noqa: E402
-from app.core.config import settings  # noqa: E402
-from app.core.db import Base, engine  # noqa: E402
+import app.main  # noqa: F401  (imports every module, so all tables are in the metadata)
+from app import seed
+from app.core.config import settings
+from app.core.db import Base, engine
 
 
 def target() -> str:

@@ -17,10 +17,12 @@ def line_doc(line: ManifestLine) -> dict:
     return {f: getattr(line, f) for f in LINE_FIELDS}
 
 
-def manifest_doc(db: Session, shipment: Shipment) -> dict:
-    lines = list(db.scalars(
-        select(ManifestLine).where(ManifestLine.shipment_id == shipment.id).order_by(ManifestLine.line_no)
-    ))
+def manifest_doc(db: Session, shipment: Shipment, lines: list[ManifestLine] | None = None) -> dict:
+    """`lines` (already ordered by line_no) lets list screens pass rows they loaded in one batch."""
+    if lines is None:
+        lines = list(db.scalars(
+            select(ManifestLine).where(ManifestLine.shipment_id == shipment.id).order_by(ManifestLine.line_no)
+        ))
     docs = [line_doc(ln) for ln in lines]
     return {
         "v": 1,

@@ -25,3 +25,11 @@ dev = [
     "pytest>=9.2.0",
     "ruff>=0.17.5",
 ]
+
+[tool.pytest.ini_options]
+markers = ["live: calls the real claude CLI (slow; needs it signed in)"]
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency injection idiom, not a mutable default.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.File", "fastapi.Form", "fastapi.Query"]

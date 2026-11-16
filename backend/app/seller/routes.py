@@ -1,14 +1,27 @@
 """Seller link (no login; the link token is the credential) + public seller list."""
 
+from collections import defaultdict
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..core.crypto import b64u_dec, key_fingerprint
-from ..core.db import DeviceKey, Payment, Receipt, Seller, Shipment, User, get_db
+from ..core.db import (
+    DeviceKey,
+    Event,
+    ManifestLine,
+    Payment,
+    Receipt,
+    Seller,
+    Shipment,
+    User,
+    get_db,
+)
 from ..core.deps import audit, current_user
-from ..integrity.service import head
+from ..integrity.manifest import manifest_doc, manifest_hash
+from ..integrity.service import GENESIS
 from ..shipments import service as svc
 
 router = APIRouter(tags=["seller"])
@@ -49,19 +62,35 @@ def list_sellers(_: User = Depends(current_user), db: Session = Depends(get_db))
 @router.get("/seller-link/{token}")
 def seller_link(token: str, db: Session = Depends(get_db)) -> dict:
     s = _seller(db, token)
+    ids = _pending_ids(db, s)
+    # One query per table for all of this shop's shipments (each round trip is slow on a remote DB).
+    ships = {sh.id: sh for sh in db.scalars(select(Shipment).where(Shipment.id.in_(ids)))}
+    traders = {u.id: u for u in db.scalars(select(User).where(User.id.in_({sh.trader_id for sh in ships.values()})))}
+    pays: dict[str, list[Payment]] = defaultdict(list)
+    for p in db.scalars(select(Payment).where(Payment.shipment_id.in_(ids), Payment.seller_id == s.id)):
+        pays[p.shipment_id].append(p)
+    receipts: dict[str, list[str]] = defaultdict(list)
+    for sid, rid in db.execute(select(Receipt.shipment_id, Receipt.id)
+                               .where(Receipt.shipment_id.in_(ids), Receipt.seller_id == s.id)):
+        receipts[sid].append(rid)
+    lines: dict[str, list[ManifestLine]] = defaultdict(list)
+    for ln in db.scalars(select(ManifestLine).where(ManifestLine.shipment_id.in_(ids)).order_by(ManifestLine.line_no)):
+        lines[ln.shipment_id].append(ln)
+    heads: dict[str, tuple[int, str]] = {}
+    for ev in db.scalars(select(Event).where(Event.shipment_id.in_(ids)).order_by(Event.seq)):
+        heads[ev.shipment_id] = (ev.seq + 1, ev.hash)
     pending = []
-    for sid in _pending_ids(db, s):
-        sh = db.get(Shipment, sid)
-        trader = db.get(User, sh.trader_id)
-        pays = list(db.scalars(select(Payment).where(Payment.shipment_id == sid, Payment.seller_id == s.id)))
-        seq, prev = head(db, sid)
+    for sid in ids:
+        sh = ships[sid]
+        trader = traders.get(sh.trader_id)
+        doc = manifest_doc(db, sh, lines[sid])
+        seq, prev = heads.get(sid, (0, GENESIS))
         pending.append({
             "shipment_id": sid, "ref": sh.ref, "state": sh.state, "trader_name": trader.name if trader else None,
-            "manifest": svc.current_manifest(db, sh),
-            "receipt_ids": list(db.scalars(select(Receipt.id).where(Receipt.shipment_id == sid,
-                                                                    Receipt.seller_id == s.id))),
-            "amount_fen": sum(p.amount_fen for p in pays),
-            "confirmed": bool(pays) and all(p.seller_confirmed for p in pays),
+            "manifest": {"canonical": doc, "manifest_hash": manifest_hash(doc)},
+            "receipt_ids": receipts[sid],
+            "amount_fen": sum(p.amount_fen for p in pays[sid]),
+            "confirmed": bool(pays[sid]) and all(p.seller_confirmed for p in pays[sid]),
             "chain_head": {"seq": seq, "prev_hash": prev},
         })
     key_ids = []

@@ -51,7 +51,8 @@ def queue(_: User = Depends(require_role("customs", "admin")), db: Session = Dep
                      "trader": {"id": sh.trader_id, "name": trader.name if trader else None},
                      "risk": svc.risk_out(sh), "integrity_ok": verify_chain(db, sh.id)["ok"] and not problems,
                      "arrived_at": arrived, "total_fen": int(totals.get(sh.id, 0))})
-    rows.sort(key=lambda r: (r["risk"]["score"] is None, -(r["risk"]["score"] or 0)))
+    # Broken integrity always comes first: the stored score is not updated by a raw database edit.
+    rows.sort(key=lambda r: (r["integrity_ok"], r["risk"]["score"] is None, -(r["risk"]["score"] or 0)))
     return rows
 
 

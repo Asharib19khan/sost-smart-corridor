@@ -24,7 +24,7 @@ log = logging.getLogger("sost.ocr")
 INJECTION_RE = re.compile(
     r"ignore|disregard|instruction|system\s*prompt|override|declare\s+as|"
     r"忽略|无视|指令|提示词|系统提示|申报|改为",
-    re.I,
+    re.IGNORECASE,
 )
 
 _translate_cache: dict[str, readers.ItemInfo] = {}
@@ -64,7 +64,7 @@ def store_upload(data: bytes) -> tuple[Path, str]:
         with Image.open(io.BytesIO(data)) as im:
             im.load()
             im = ImageOps.exif_transpose(im).convert("RGB")
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         raise UploadRejected(415, "This photo could not be opened. Take it again and upload a JPEG or PNG.") from exc
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=90)
@@ -176,7 +176,7 @@ def process_receipt(receipt_id: str) -> None:
             raw, reader = readers.read_receipt(prepped)
             apply_reading(db, receipt, raw, reader)
             db.commit()
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             db.rollback()
             log.exception("receipt %s failed", receipt_id)
             receipt = db.get(Receipt, receipt_id)

@@ -9,17 +9,17 @@ _TMP = Path(tempfile.mkdtemp(prefix="sost_ocr_test_"))
 os.environ["SOST_DATABASE_URL"] = f"sqlite:///{(_TMP / 'test.db').as_posix()}"
 os.environ["SOST_UPLOAD_DIR"] = str(_TMP / "uploads")
 
-import jwt  # noqa: E402
-import pytest  # noqa: E402
-from fastapi.testclient import TestClient  # noqa: E402
-from PIL import Image, ImageDraw, ImageFont  # noqa: E402
+import jwt
+import pytest
+from fastapi.testclient import TestClient
+from PIL import Image, ImageDraw, ImageFont
 
-from app.core.config import settings  # noqa: E402
-from app.core.db import AuditLog, ManifestLine, SessionLocal, Shipment, User, init_db  # noqa: E402
-from app.main import app  # noqa: E402
-from app.ocr import readers, service  # noqa: E402
-from app.ocr import seed as ocr_seed  # noqa: E402
-from app.ocr.readers import ItemInfo, RawLine, RawReceipt  # noqa: E402
+from app.core.config import settings
+from app.core.db import AuditLog, ManifestLine, SessionLocal, Shipment, User, init_db
+from app.main import app
+from app.ocr import readers, service
+from app.ocr import seed as ocr_seed
+from app.ocr.readers import ItemInfo, RawLine, RawReceipt
 
 FIXTURES = Path(__file__).parent / "fixtures" / "ocr"
 

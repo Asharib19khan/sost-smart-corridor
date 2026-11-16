@@ -14,7 +14,7 @@ from .service import head, verify_chain
 router = APIRouter(tags=["integrity"])
 
 
-def _iso(dt) -> str | None:  # noqa: ANN001
+def _iso(dt) -> str | None:
     return dt.isoformat() if dt is not None else None
 
 

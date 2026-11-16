@@ -71,7 +71,7 @@ def _plain(v: Any) -> Any:
 
 
 def _rows(db: Session, table: str, shipment_id: str) -> list[dict]:
-    res = db.execute(text(f"SELECT * FROM {table} WHERE shipment_id = :s"), {"s": shipment_id})  # noqa: S608
+    res = db.execute(text(f"SELECT * FROM {table} WHERE shipment_id = :s"), {"s": shipment_id})
     return [{k: _plain(v) for k, v in r.items()} for r in res.mappings()]
 
 
@@ -153,12 +153,12 @@ def tamper(body: TamperIn, request: Request, user: User = Depends(admin_only),
 def _upsert(db: Session, table: str, rows: list[dict]) -> None:
     for r in rows:
         cols = list(r)
-        exists = db.execute(text(f"SELECT 1 FROM {table} WHERE id = :id"), {"id": r["id"]}).first()  # noqa: S608
+        exists = db.execute(text(f"SELECT 1 FROM {table} WHERE id = :id"), {"id": r["id"]}).first()
         if exists:
             sets = ", ".join(f"{c} = :{c}" for c in cols if c != "id")
-            db.execute(text(f"UPDATE {table} SET {sets} WHERE id = :id"), r)  # noqa: S608
+            db.execute(text(f"UPDATE {table} SET {sets} WHERE id = :id"), r)
         else:
-            db.execute(text(f"INSERT INTO {table} ({', '.join(cols)}) "  # noqa: S608
+            db.execute(text(f"INSERT INTO {table} ({', '.join(cols)}) "
                             f"VALUES ({', '.join(':' + c for c in cols)})"), r)
 
 

@@ -18,9 +18,9 @@ import httpx
 from nacl.signing import SigningKey
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.core.canonical import canonical_hash  # noqa: E402
-from app.core.crypto import b64u, key_fingerprint  # noqa: E402
-from app.core.db import Seller, SessionLocal  # noqa: E402
+from app.core.canonical import canonical_hash
+from app.core.crypto import b64u, key_fingerprint
+from app.core.db import Seller, SessionLocal
 
 RECEIPTS = Path(__file__).resolve().parents[2] / "demo" / "receipts"
 KEYS = Path(__file__).resolve().parents[1] / "data" / "demo_keys"
