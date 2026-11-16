@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # OCR reader: "claude_cli" (local `claude -p`), "paddle", or "auto" (claude then paddle)
     ocr_reader: str = "auto"
     claude_cli: str = "claude"
+    claude_model: str = "sonnet"  # fast + cheap enough for OCR/translation
     ocr_timeout_s: int = 120
     # Demo FX rate CNY->PKR, labelled on screen as fixed sandbox rate.
     fx_cny_pkr: float = 39.0

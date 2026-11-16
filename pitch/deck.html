@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sost Smart Corridor</title>
+<style>
+:root{
+  --paper:#ffffff; --ink:#111214; --mute:#6b6e75; --rule:#e4e2dc; --soft:#f5f3ee;
+  --accent:#c8381e; --ok:#1f6b4a; --snow:#dfe6ea;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --mono:Consolas,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#d9d7d1;height:100%;overflow:hidden;font-family:var(--sans);color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--paper);padding:110px 140px 150px;display:none;overflow:hidden}
+.slide.on{display:block}
+.kicker{font:600 22px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:-.02em}
+h1{font-size:150px;line-height:.95}
+h2{font-size:84px;line-height:1.02;max-width:1500px;margin-top:28px}
+p.lede{font-size:34px;line-height:1.4;color:var(--mute);max-width:1200px;margin-top:30px}
+.src{position:absolute;left:140px;right:140px;bottom:92px;font-size:16px;color:var(--mute);line-height:1.5}
+.src a{color:var(--mute)}
+/* corridor footer spine */
+.spine{position:absolute;left:140px;right:140px;bottom:44px;height:28px}
+.num{position:absolute;right:140px;top:60px;font:500 20px var(--mono);color:var(--mute)}
+.brand{position:absolute;left:140px;top:60px;font:600 20px var(--sans);letter-spacing:.08em;color:var(--ink)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:70px;border-top:2px solid var(--ink)}
+.stat{padding:34px 36px 0 0;border-right:1px solid var(--rule);margin-right:36px}
+.stat:last-child{border-right:0}
+.stat b{display:block;font:500 120px/1 var(--serif);letter-spacing:-.03em}
+.stat b small{font-size:52px}
+.stat span{display:block;font-size:25px;line-height:1.35;margin-top:18px;color:#33353a}
+.stat.red b{color:var(--accent)}
+/* people */
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:70px}
+.person{border-top:8px solid var(--ink);padding-top:30px}
+.person:nth-child(3){border-color:var(--accent)}
+.person h3{font:500 52px var(--serif)}
+.person .q{font:italic 32px/1.35 var(--serif);margin:22px 0;color:#26282c}
+.person p{font-size:24px;line-height:1.45;color:var(--mute)}
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(6,1fr);margin-top:80px;position:relative}
+.flow:before{content:"";position:absolute;left:0;right:0;top:34px;height:3px;background:var(--ink)}
+.step{position:relative;padding-right:28px}
+.step i{display:block;width:70px;height:70px;border-radius:50%;background:var(--paper);border:3px solid var(--ink);font:600 26px/64px var(--mono);text-align:center;font-style:normal;position:relative}
+.step:nth-child(3) i{background:var(--accent);border-color:var(--accent);color:#fff}
+.step h4{font:500 36px var(--serif);margin-top:28px}
+.step p{font-size:22px;line-height:1.4;color:var(--mute);margin-top:10px}
+.demo{position:absolute;right:140px;top:110px;border:3px solid var(--accent);color:var(--accent);padding:16px 26px;font:700 24px var(--mono);letter-spacing:.1em}
+/* chain */
+.chain{display:flex;gap:22px;margin-top:64px;align-items:stretch}
+.blk{flex:1;border:2px solid var(--ink);padding:22px 24px;font:20px/1.5 var(--mono);background:var(--paper)}
+.blk .t{font:600 26px var(--sans);margin-bottom:10px}
+.blk.bad{border-color:var(--accent);background:#fbeee9}
+.blk.bad .t{color:var(--accent)}
+.blk.after{opacity:.45;border-style:dashed}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;margin-top:56px}
+.trust div{border-left:3px solid var(--ink);padding-left:22px}
+.trust b{font:500 34px var(--serif);display:block}
+.trust span{font-size:22px;line-height:1.4;color:var(--mute)}
+/* layers */
+.layers{display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:auto auto;margin-top:60px;border-top:2px solid var(--ink);border-left:1px solid var(--rule)}
+.layer{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:26px 24px 30px;min-height:220px}
+.layer em{font:500 22px var(--mono);font-style:normal;color:var(--accent)}
+.layer b{display:block;font:500 32px/1.15 var(--serif);margin:14px 0 10px}
+.layer span{font-size:20px;line-height:1.4;color:var(--mute)}
+/* tests */
+.tests{columns:2;column-gap:90px;margin-top:60px}
+.tests div{break-inside:avoid;display:flex;gap:22px;padding:20px 0;border-bottom:1px solid var(--rule);font-size:28px;line-height:1.35}
+.tests div:before{content:"";flex:0 0 18px;height:18px;margin-top:9px;border:3px solid var(--ok)}
+/* two col */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:100px;margin-top:60px}
+.two h3{font:600 22px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--mute);padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.row{display:flex;justify-content:space-between;gap:30px;padding:22px 0;border-bottom:1px solid var(--rule);font-size:28px;line-height:1.35}
+.row b{font-weight:600}
+.row span{color:var(--mute);text-align:right}
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(4,1fr);margin-top:80px;border-top:3px solid var(--ink)}
+.road div{padding:30px 34px 0 0}
+.road em{font:600 22px var(--mono);font-style:normal;color:var(--mute)}
+.road div.now em{color:var(--accent)}
+.road b{display:block;font:500 44px/1.1 var(--serif);margin:16px 0 14px}
+.road span{font-size:23px;line-height:1.45;color:#3a3c41}
+/* title */
+.title h1{margin-top:40px}
+.route{position:absolute;left:0;right:0;bottom:0;width:1920px;height:560px}
+.ask h2{font-size:104px}
+.askgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:70px}
+.askgrid div{border-top:8px solid var(--accent);padding-top:26px}
+.askgrid b{font:500 46px var(--serif);display:block}
+.askgrid span{display:block;margin-top:14px;font-size:25px;line-height:1.45;color:#3a3c41}
+.hint{position:fixed;right:18px;bottom:12px;font:13px var(--sans);color:#55575c}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{overflow:visible;background:#fff;height:auto}
+  #stage{position:static;transform:none!important}
+  .slide{display:block!important;position:relative;width:1920px;height:1080px;page-break-after:always;break-after:page}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 TITLE -->
+<section class="slide title">
+  <div class="num">01</div>
+  <div class="kicker" style="margin-top:20px">Kashgar &rarr; Khunjerab &rarr; Sost</div>
+  <h1 data-name></h1>
+  <p class="lede">Every receipt, every checkpoint, every rupee on the Khunjerab route, signed on the trader&rsquo;s phone and checkable by anyone with a camera.</p>
+  <svg class="route" viewBox="0 0 1920 560" aria-label="Route from Kashgar over the Khunjerab Pass to Sost">
+    <path d="M0 520 L260 470 L420 420 L560 300 L700 360 L860 170 L960 92 L1060 180 L1180 120 L1320 300 L1480 260 L1640 400 L1920 470 L1920 560 L0 560Z" fill="#f2f1ec"/>
+    <path d="M900 135 L960 92 L1010 128 L985 140 L960 120 L935 142Z" fill="#fff" stroke="#dfe6ea"/>
+    <path id="rt" d="M170 455 C 420 430, 560 360, 760 260 S 920 120, 960 104 S 1120 200, 1300 300 S 1600 410, 1760 420" fill="none" stroke="#111214" stroke-width="5" stroke-linecap="round"/>
+    <path d="M170 455 C 420 430, 560 360, 760 260 S 920 120, 960 104 S 1120 200, 1300 300 S 1600 410, 1760 420" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="2 22"/>
+    <g font-family="Segoe UI,Arial" font-size="24" fill="#111214">
+      <circle cx="170" cy="455" r="14" fill="#111214"/><text x="150" y="410" font-weight="600">KASHGAR</text><text x="150" y="505" fill="#6b6e75" font-size="20">Buy &middot; scan receipt &middot; seal</text>
+      <circle cx="960" cy="104" r="14" fill="#c8381e"/><text x="960" y="28" text-anchor="middle" font-weight="600">KHUNJERAB PASS</text><text x="960" y="60" text-anchor="middle" fill="#6b6e75" font-size="20">4,693 m &middot; no signal &middot; signed offline</text>
+      <circle cx="1760" cy="420" r="14" fill="#111214"/><text x="1650" y="380" font-weight="600">SOST DRY PORT</text><text x="1640" y="470" fill="#6b6e75" font-size="20">Verify &middot; risk-rank &middot; clear</text>
+    </g>
+  </svg>
+</section>
+
+<!-- 2 PROBLEM -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">02</div>
+  <div class="kicker">The problem</div>
+  <h2>The route is open all year. Trust in what crosses it is not.</h2>
+  <div class="stats">
+    <div class="stat red"><b>240</b><span>consignments from China stuck at Sost for seven months, per traders&rsquo; demands, July 2025</span></div>
+    <div class="stat red"><b>68<small> days</small></b><span>Khunjerab trade suspended in 2025 during the clearance and tax dispute</span></div>
+    <div class="stat"><b>Rs14.9<small>bn</small></b><span>customs revenue on Khunjerab imports, FY2025-26 &mdash; a record for the route</span></div>
+    <div class="stat"><b>$4.4<small>bn</small></b><span>China&ndash;Pakistan mirror-data gap in 2013 (PBC). Officially disputed &mdash; which is exactly the problem: no one can prove the numbers.</span></div>
+  </div>
+  <div class="src">Sources: Dawn, 2025-07 (dawn.com/news/1925708); Dawn, 2025-10 (dawn.com/news/1949453); Dawn / Pakistan Observer, 2026 (dawn.com/news/1953421); PBC via Business Recorder, 2018-03-12; FBR reconciliation, ProPakistani 2023-11-30. Full list: docs/research/FACTS.md</div>
+</section>
+
+<!-- 3 WHO SUFFERS -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">03</div>
+  <div class="kicker">Who pays for missing trust</div>
+  <h2>Three honest people, one broken paper trail.</h2>
+  <div class="people">
+    <div class="person"><h3>The trader</h3><p class="q">&ldquo;My receipt is in Chinese. My goods wait months. I carry cash over the pass.&rdquo;</p><p>Small importer from Gilgit-Baltistan. Paper receipts, manual declarations, no record they can prove.</p></div>
+    <div class="person"><h3>Customs at Sost</h3><p class="q">&ldquo;Every file looks the same. I can&rsquo;t tell which truck to open.&rdquo;</p><p>Values and HS codes declared by hand. No way to tell a clean file from an edited one.</p></div>
+    <div class="person"><h3>The honest seller</h3><p class="q">&ldquo;Someone rewrote my invoice. My name is on the fraud.&rdquo;</p><p>Kashgar wholesaler whose real price gets under-declared later in the chain.</p></div>
+  </div>
+</section>
+
+<!-- 4 WHAT WE BUILT -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">04</div>
+  <div class="demo">LIVE DEMO &middot; 90 s</div>
+  <div class="kicker">What we built</div>
+  <h2>One phone app from market stall to port gate.</h2>
+  <div class="flow">
+    <div class="step"><i>1</i><h4>Scan</h4><p>AI reads the Chinese receipt, translates it, suggests 8-digit PCT codes, checks sums and value bands.</p></div>
+    <div class="step"><i>2</i><h4>Manifest</h4><p>WeBOC-style declaration built from the lines. Trader confirms each one.</p></div>
+    <div class="step"><i>3</i><h4>Seal</h4><p>Ed25519 signature made on the phone. A QR seal anyone can verify.</p></div>
+    <div class="step"><i>4</i><h4>Transit</h4><p>Signed GPS checkpoints, offline over the pass, synced at Sost.</p></div>
+    <div class="step"><i>5</i><h4>Pay</h4><p>Seller counter-signs amount. Double-entry sandbox ledger.</p></div>
+    <div class="step"><i>6</i><h4>Clear</h4><p>Risk-ranked console. Tamper shown to the exact line. Trust score grows.</p></div>
+  </div>
+</section>
+
+<!-- 5 HOW TRUST WORKS -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">05</div>
+  <div class="kicker">How trust works</div>
+  <h2>Change one number and the chain points at it.</h2>
+  <div class="chain">
+    <div class="blk"><div class="t">#1 Manifest sealed</div>signer: trader phone<br>hash 9f3c&hellip;a1<br>prev &mdash;</div>
+    <div class="blk"><div class="t">#2 Seller signs</div>amount CNY 18,400<br>hash 41be&hellip;07<br>prev 9f3c&hellip;a1</div>
+    <div class="blk bad"><div class="t">#3 Checkpoint &mdash; BROKEN</div>line 3 qty 120 &rarr; 80<br>hash &ne; signed hash<br>signature fails</div>
+    <div class="blk after"><div class="t">#4 Arrived Sost</div>prev no longer matches<br>flagged downstream</div>
+  </div>
+  <div class="trust">
+    <div><b>Sign on the phone</b><span>Private key never leaves the device. Server keeps public keys only.</span></div>
+    <div><b>Chain every event</b><span>Each event carries the hash of the one before it.</span></div>
+    <div><b>QR anyone verifies</b><span>The seal checks its own signature in the browser, no server trust needed.</span></div>
+    <div><b>Tamper shows the step</b><span>Officer sees which event, which line, which field.</span></div>
+  </div>
+</section>
+
+<!-- 6 SECURITY LAYERS -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">06</div>
+  <div class="kicker">Ten layers, one envelope</div>
+  <h2>To forge a shipment you must beat all ten.</h2>
+  <div class="layers">
+    <div class="layer"><em>01</em><b>Device keys</b><span>Ed25519 generated in the browser, non-exportable</span></div>
+    <div class="layer"><em>02</em><b>Canonical hash</b><span>RFC 8785 JSON, same bytes in Python and JS</span></div>
+    <div class="layer"><em>03</em><b>Hash chain</b><span>Every event links to the previous one</span></div>
+    <div class="layer"><em>04</em><b>Published head</b><span>Server counter-signs the chain head after each event</span></div>
+    <div class="layer"><em>05</em><b>Self-verifying QR</b><span>Seal carries hash, signature, key fingerprint</span></div>
+    <div class="layer"><em>06</em><b>Replay guard</b><span>Nonce per event, device and server time both kept</span></div>
+    <div class="layer"><em>07</em><b>Append-only audit</b><span>Database triggers reject updates and deletes</span></div>
+    <div class="layer"><em>08</em><b>Key revocation</b><span>Lost phone? Its later signatures stop counting</span></div>
+    <div class="layer"><em>09</em><b>PIN lockout</b><span>Five bad PINs locks the account; rate limits on API</span></div>
+    <div class="layer"><em>10</em><b>Safe uploads</b><span>Magic-byte check, size cap, re-encoded images</span></div>
+  </div>
+</section>
+
+<!-- 7 WHY IT'S REAL -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">07</div>
+  <div class="kicker">Why it&rsquo;s real</div>
+  <h2>We attacked it before you could.</h2>
+  <div class="tests">
+    <div>Edited field caught at the exact event</div>
+    <div>Deleted event caught</div>
+    <div>Re-ordered events caught</div>
+    <div>Replayed event rejected by nonce</div>
+    <div>Signature from a revoked key rejected</div>
+    <div>Python and JavaScript hash the same test vectors</div>
+    <div>Raw SQL tamper in the &ldquo;Tamper lab&rdquo; shows on the console</div>
+    <div>Ledger refuses any entry where debits &ne; credits</div>
+    <div>Offline checkpoints sync later and still verify</div>
+    <div>Seller counter-signature bound to manifest hash and amount</div>
+  </div>
+</section>
+
+<!-- 8 BUSINESS + REGULATION -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">08</div>
+  <div class="kicker">Business model &amp; regulation</div>
+  <h2>Free to verify. Paid to move money.</h2>
+  <div class="two">
+    <div><h3>Revenue</h3>
+      <div class="row"><b>Verification</b><span>Free for customs and anyone scanning a seal</span></div>
+      <div class="row"><b>Trader</b><span>Per-shipment fee for sealing and manifest</span></div>
+      <div class="row"><b>Payments</b><span>Share of partner FX/transfer fee</span></div>
+      <div class="row"><b>Credit</b><span>Referral fee when trust score unlocks a lender&rsquo;s limit</span></div>
+    </div>
+    <div><h3>Regulation, honestly</h3>
+      <div class="row"><b>Today</b><span>Sandbox ledger. No real money moves.</span></div>
+      <div class="row"><b>Production</b><span>Through a licensed bank / EMI under SBP rules</span></div>
+      <div class="row"><b>CNY</b><span>Via RMB clearing banks (ICBC, BOC, SCB in Pakistan), not Raast &mdash; Raast is PKR-only</span></div>
+      <div class="row"><b>Customs</b><span>Assists officers; WeBOC stays the system of record</span></div>
+    </div>
+  </div>
+  <div class="src">Sources: SBP, Raast (sbp.org.pk/our-subsidiaries/raast); Business Recorder 2023-10-28, ICBC RMB clearing; Dawn 2019, SCB CNY clearing.</div>
+</section>
+
+<!-- 9 ROADMAP -->
+<section class="slide">
+  <div class="brand" data-name></div><div class="num">09</div>
+  <div class="kicker">Roadmap</div>
+  <h2>Same signed event, from phone to hardware seal.</h2>
+  <div class="road">
+    <div class="now"><em>NOW</em><b>Working prototype</b><span>Phone signing, QR seal, chain, console, sandbox ledger, trust score.</span></div>
+    <div><em>NEXT</em><b>Sost pilot</b><span>A handful of GB traders and one customs desk, real shipments, paper kept in parallel.</span></div>
+    <div><em>THEN</em><b>IoT e-seal</b><span>Hardware lock emits the same signed envelope. GPS becomes proof, not a signal.</span></div>
+    <div><em>LATER</em><b>PSW / WeBOC link</b><span>Feed verified manifests into Pakistan Single Window and FBR&rsquo;s planned cargo tracking system.</span></div>
+  </div>
+  <div class="src">FBR began design of a Digital National Cargo Tracking System in March 2026 (Dawn, dawn.com/news/1978938) &mdash; our event format is built to plug into it.</div>
+</section>
+
+<!-- 10 ASK -->
+<section class="slide ask">
+  <div class="brand" data-name></div><div class="num">10</div>
+  <div class="kicker">The ask</div>
+  <h2>One desk at Sost. One season. Real trucks.</h2>
+  <div class="askgrid">
+    <div><b>Pakistan Customs, GB</b><span>A pilot desk at Sost Dry Port and an officer to test the risk console.</span></div>
+    <div><b>GB Chamber of Commerce</b><span>Ten to twenty traders to seal real shipments from Kashgar.</span></div>
+    <div><b>A licensed partner</b><span>A bank or EMI to take the ledger out of sandbox.</span></div>
+  </div>
+  <p class="lede" style="margin-top:70px;color:var(--ink)">Scan the seal. Check it yourself.</p>
+</section>
+
+</div>
+<div class="hint">&larr; &rarr; or click &middot; P to print</div>
+<script>
+// Product name lives here only. Rename once.
+const PRODUCT_NAME = "Sost Smart Corridor";
+document.title = PRODUCT_NAME;
+document.querySelectorAll("[data-name]").forEach(e => e.textContent = PRODUCT_NAME);
+
+const slides = [...document.querySelectorAll(".slide")];
+const stage = document.getElementById("stage");
+// spine footer on every slide except title
+slides.forEach((s, i) => {
+  if (i === 0) return;
+  const x = 40 + (i / (slides.length - 1)) * 1560;
+  s.insertAdjacentHTML("beforeend",
+    `<svg class="spine" viewBox="0 0 1640 28" preserveAspectRatio="none"><line x1="40" y1="14" x2="1600" y2="14" stroke="#e4e2dc" stroke-width="3"/><line x1="40" y1="14" x2="${x}" y2="14" stroke="#111214" stroke-width="3"/><circle cx="40" cy="14" r="6" fill="#111214"/><circle cx="820" cy="14" r="6" fill="#c8381e"/><circle cx="1600" cy="14" r="6" fill="#111214"/><circle cx="${x}" cy="14" r="9" fill="#fff" stroke="#111214" stroke-width="3"/></svg>`);
+});
+let cur = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
+function show(n) {
+  cur = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, i) => s.classList.toggle("on", i === cur));
+  history.replaceState(null, "", "#" + (cur + 1));
+}
+function fit() {
+  const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+  stage.style.transform = `translate(-50%,-50%) scale(${k})`;
+}
+addEventListener("resize", fit);
+addEventListener("keydown", e => {
+  if (["ArrowRight", "PageDown", " "].includes(e.key)) show(cur + 1);
+  if (["ArrowLeft", "PageUp"].includes(e.key)) show(cur - 1);
+  if (e.key === "Home") show(0);
+  if (e.key === "End") show(slides.length - 1);
+  if (e.key === "p" || e.key === "P") print();
+});
+addEventListener("click", e => show(e.clientX < innerWidth / 3 ? cur - 1 : cur + 1));
+fit(); show(cur);
+</script>
+</body>
+</html>

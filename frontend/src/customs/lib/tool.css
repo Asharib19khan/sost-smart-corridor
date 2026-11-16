@@ -1,0 +1,32 @@
+/* Dense tool styling for /c, /admin and /v. Uses the shared role tokens only. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) { background: var(--color-sunken); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--color-accent); color: var(--color-accent-fg); border-color: var(--color-accent); }
+.btn-primary:hover:not(:disabled) { background: var(--color-accent); filter: brightness(0.92); }
+.btn-bad { color: var(--color-bad); border-color: var(--color-bad); }
+.btn-bad:hover:not(:disabled) { background: var(--color-bad-soft); }
+
+.field { border: 1px solid var(--color-line); background: var(--color-surface); border-radius: 4px; padding: 0.3rem 0.5rem; font-size: 0.875rem; }
+
+.tbl { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.tbl th { text-align: start; font-weight: 500; color: var(--color-muted); font-size: 0.75rem; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--color-line); white-space: nowrap; background: var(--color-surface); }
+.tbl td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--color-line); vertical-align: top; }
+.tbl tbody tr:hover { background: var(--color-sunken); }
+.tbl .num { text-align: end; font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl tr.row-bad td { background: var(--color-bad-soft); color: var(--color-bad); }
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--color-line); border-radius: 4px; background: var(--color-surface); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
