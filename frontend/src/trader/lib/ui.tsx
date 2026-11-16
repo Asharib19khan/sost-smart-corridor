@@ -81,6 +81,20 @@ export function CheckIcon({ className = '' }: { className?: string }) {
   )
 }
 
+export function CrossIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden className={`inline-block shrink-0 align-[-0.15em] ${className}`}>
+      <path d="m4.5 4.5 7 7m0-7-7 7" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+/** Three-state result mark: passed, failed, or still waiting on a check. */
+export function StatusMark({ ok, className = '' }: { ok: boolean | null; className?: string }) {
+  if (ok === null) return <span aria-hidden className={`inline-grid size-4 shrink-0 place-items-center ${className}`}><span className="size-1.5 animate-pulse rounded-full bg-muted" /></span>
+  return ok ? <CheckIcon className={`text-ok ${className}`} /> : <CrossIcon className={`text-bad ${className}`} />
+}
+
 /** Points toward the reading direction's end (right in English, left in Urdu). */
 export function ChevronEnd({ className = '' }: { className?: string }) {
   return (

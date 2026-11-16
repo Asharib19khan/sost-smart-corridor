@@ -13,7 +13,7 @@ interface WalletT {
 }
 interface TrustReason { delta: number; reason: string; at?: string; shipment_ref?: string | null }
 interface Trust { score: number; reasons: TrustReason[]; credit_limit_paisa: number; formula: string }
-interface Duty { fx_label: string; total_paisa: number; lines: { line_no: number; hs_code: string; value_paisa: number; duty_paisa: number; sales_tax_paisa: number }[] }
+interface Duty { fx_label: string; total_paisa: number; lines: { line_no: number; hs_code: string; item_en?: string; value_paisa: number; duty_pct: number; duty_paisa: number; sales_tax_pct: number; sales_tax_paisa: number }[] }
 
 export function Wallet() {
   const { t } = useTranslation()
@@ -83,8 +83,13 @@ export function DutyScreen() {
         <>
           <Notice tone="info" title={t('trader.duty.indicative')}>{d.data.fx_label}</Notice>
           <ul>{d.data.lines.map((l) => (
-            <li key={l.line_no} className="flex justify-between gap-3 border-b border-line py-3 text-sm" dir="ltr">
-              <span>#{l.line_no} · HS {l.hs_code}</span><span className="tabular-nums">{paisa(l.duty_paisa + l.sales_tax_paisa)}</span>
+            <li key={l.line_no} className="flex justify-between gap-4 border-b border-line py-3 text-sm">
+              <span className="min-w-0">
+                <span className="block font-medium">{l.item_en || `#${l.line_no}`}</span>
+                <span className="block text-muted" dir="ltr">HS {l.hs_code} · {t('trader.duty.on', { value: paisa(l.value_paisa) })}</span>
+                <span className="block text-muted" dir="ltr">{t('trader.duty.split', { duty: paisa(l.duty_paisa), dp: l.duty_pct, tax: paisa(l.sales_tax_paisa), tp: l.sales_tax_pct })}</span>
+              </span>
+              <span dir="ltr" className="shrink-0 font-semibold tabular-nums">{paisa(l.duty_paisa + l.sales_tax_paisa)}</span>
             </li>
           ))}</ul>
           <div className="flex items-baseline justify-between py-4 text-lg font-semibold"><span>{t('trader.duty.total')}</span><span dir="ltr">{paisa(d.data.total_paisa)}</span></div>

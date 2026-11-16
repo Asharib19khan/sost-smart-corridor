@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next'
 import jsQR from 'jsqr'
 import { api } from '../shared/api'
 import { b64uDec, verifyHash } from '../shared/crypto/keys'
-import { Button, ErrorBox, Field, Loading, Mono, Notice, Shell, errText } from '../trader/lib/ui'
+import { Button, ErrorBox, Field, Loading, Mono, Notice, Shell, StatusMark, errText } from '../trader/lib/ui'
+import { when } from '../customs/lib/format'
 import { short } from '../trader/lib/money'
 import type { VerifyReport } from '../trader/lib/types'
 
@@ -52,8 +53,8 @@ function Result({ id, hash }: { id: string; hash: string }) {
   const all = !!rep?.overall.ok && local === true && sealMatches === true && keyOk === true
   const Check = ({ ok, label, pending }: { ok: boolean | null; label: string; pending?: boolean }) => (
     <li className="flex items-start gap-3 border-b border-line py-3">
-      <span aria-hidden className={`mt-0.5 font-bold ${ok === null ? 'text-muted' : ok ? 'text-ok' : 'text-bad'}`}>{ok === null ? '…' : ok ? '✓' : '✗'}</span>
-      <span className={pending ? 'text-muted' : ''}>{label}</span>
+      {pending ? <svg aria-hidden width="16" height="16" viewBox="0 0 16 16" className="mt-1 shrink-0 text-muted"><path d="M4.5 8h7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" /></svg> : <StatusMark ok={ok} className="mt-1" />}
+      <span className={pending ? 'text-muted' : ''}>{label}{pending && <span className="block text-sm">{t('verify.needsSeal')}</span>}</span>
     </li>
   )
   return (
@@ -65,8 +66,8 @@ function Result({ id, hash }: { id: string; hash: string }) {
           </Notice>
           <ul>
             <Check ok={seal ? local : false} label={seal ? t('verify.localSig') : t('verify.noSeal')} />
-            <Check ok={keyOk} label={t('verify.keyReg')} />
-            <Check ok={sealMatches} label={t('verify.matchesNow')} />
+            <Check ok={keyOk} label={t('verify.keyReg')} pending={!seal} />
+            <Check ok={sealMatches} label={t('verify.matchesNow')} pending={!seal} />
             <Check ok={rep.manifest.ok} label={rep.manifest.ok ? t('verify.manifestOk') : t('verify.manifestBad', { n: rep.manifest.problems.map((p) => p.line_no).join(', ') })} />
             <Check ok={rep.chain.ok} label={rep.chain.ok ? t('verify.chainOk', { n: rep.chain.steps.length }) : t('verify.chainBad', { n: rep.chain.broken_at })} />
           </ul>
@@ -74,12 +75,14 @@ function Result({ id, hash }: { id: string; hash: string }) {
           <h2 className="mt-8 border-b border-fg pb-2 text-lg font-semibold">{t('verify.history')}</h2>
           <ul>
             {rep.chain.steps.map((s) => (
-              <li key={s.seq} className="border-b border-line py-3 text-sm">
-                <span className={s.ok ? 'text-ok' : 'font-semibold text-bad'}>{s.ok ? '✓' : '✗'}</span>{' '}
-                <span className="font-medium">{s.seq + 1}. {s.type}{typeof s.payload?.checkpoint === 'string' ? ` · ${s.payload.checkpoint}` : ''}</span>
-                <span className="block text-muted" dir="ltr">{s.signer.name} ({s.signer.role}) · {new Date(s.signed_at).toLocaleString()}</span>
+              <li key={s.seq} className="flex gap-3 border-b border-line py-3 text-sm">
+                <StatusMark ok={s.ok} className="mt-0.5" />
+                <span className="min-w-0">
+                <span className="font-medium">{s.seq + 1}. {t(`customs.step.${s.type}`, { defaultValue: s.type })}{typeof s.payload?.checkpoint === 'string' ? ` · ${t(`customs.step.${s.payload.checkpoint}`, { defaultValue: s.payload.checkpoint })}` : ''}{typeof s.payload?.decision === 'string' ? ` · ${t(`customs.step.${s.payload.decision}`, { defaultValue: s.payload.decision })}` : ''}</span>
+                <span className="block text-muted"><bdi>{s.signer.name}</bdi> · {t(`common.role.${s.signer.role}`, { defaultValue: s.signer.role })} · <span dir="ltr">{when(s.signed_at)}</span></span>
                 {s.problem && <span className="block text-bad">{s.problem}</span>}
                 {s.flags?.map((f) => <span key={f} className="block text-warn">{f}</span>)}
+                </span>
               </li>
             ))}
           </ul>
