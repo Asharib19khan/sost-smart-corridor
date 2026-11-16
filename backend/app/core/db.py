@@ -259,7 +259,7 @@ class ValueBand(Base):
 
 
 connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-engine = create_engine(settings.database_url, connect_args=connect_args)
+engine = create_engine(settings.database_url, connect_args=connect_args, pool_pre_ping=True)
 SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
 
@@ -281,6 +281,24 @@ APPEND_ONLY_SQLITE = [
 ]
 
 
+APPEND_ONLY_POSTGRES = [
+    "CREATE OR REPLACE FUNCTION audit_log_append_only() RETURNS trigger AS $$ "
+    "BEGIN RAISE EXCEPTION 'audit_log is append-only'; END; $$ LANGUAGE plpgsql",
+    "DROP TRIGGER IF EXISTS audit_no_mod ON audit_log",
+    "CREATE TRIGGER audit_no_mod BEFORE UPDATE OR DELETE ON audit_log "
+    "FOR EACH ROW EXECUTE FUNCTION audit_log_append_only()",
+]
+
+
+def _postgres_hardening(conn) -> None:  # noqa: ANN001
+    """Supabase exposes tables over a public REST API. Row-level security with NO policies means the publishable key
+    can read nothing; this server connects as the owner role, which bypasses RLS."""
+    for stmt in APPEND_ONLY_POSTGRES:
+        conn.execute(text(stmt))
+    for table in Base.metadata.tables:
+        conn.execute(text(f'ALTER TABLE "{table}" ENABLE ROW LEVEL SECURITY'))
+
+
 def init_db() -> None:
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     if settings.database_url.startswith("sqlite"):
@@ -292,6 +310,9 @@ def init_db() -> None:
         with engine.begin() as conn:
             for stmt in APPEND_ONLY_SQLITE:
                 conn.execute(text(stmt))
+    elif engine.dialect.name == "postgresql":
+        with engine.begin() as conn:
+            _postgres_hardening(conn)
 
 
 def get_db() -> Iterator[Session]:

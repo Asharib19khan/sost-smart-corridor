@@ -8,7 +8,8 @@ import time
 from pathlib import Path
 
 _tmp = tempfile.mkdtemp(prefix="sost_e2e_")
-os.environ["SOST_DATABASE_URL"] = f"sqlite:///{Path(_tmp, 'e2e.db').as_posix()}"
+# Set SOST_E2E_DATABASE_URL to run the same story against Postgres/Supabase.
+os.environ["SOST_DATABASE_URL"] = os.environ.get("SOST_E2E_DATABASE_URL") or f"sqlite:///{Path(_tmp, 'e2e.db').as_posix()}"
 os.environ["SOST_UPLOAD_DIR"] = str(Path(_tmp, "uploads"))
 
 import base64  # noqa: E402
