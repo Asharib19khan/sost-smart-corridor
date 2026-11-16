@@ -79,7 +79,7 @@ export interface ShipmentDetail {
 export interface Duty {
   fx_cny_pkr: number | string
   fx_label: string
-  lines: { line_no: number; hs_code: string; value_paisa: number; duty_pct: number; duty_paisa: number; sales_tax_paisa: number }[]
+  lines: { line_no: number; hs_code: string; value_paisa: number; duty_pct: number; duty_paisa: number; acd_pct: number; acd_paisa: number; rd_pct: number; rd_paisa: number; sales_tax_paisa: number; wht_paisa: number }[]
   total_paisa: number
   psw_record?: Record<string, unknown>
 }

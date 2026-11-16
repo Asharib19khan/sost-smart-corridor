@@ -13,7 +13,8 @@ interface WalletT {
 }
 interface TrustReason { delta: number; reason: string; at?: string; shipment_ref?: string | null }
 interface Trust { score: number; reasons: TrustReason[]; credit_limit_paisa: number; formula: string }
-interface Duty { fx_label: string; total_paisa: number; lines: { line_no: number; hs_code: string; item_en?: string; value_paisa: number; duty_pct: number; duty_paisa: number; sales_tax_pct: number; sales_tax_paisa: number }[] }
+interface Duty { fx_label: string; total_paisa: number; lines: DutyLine[] }
+interface DutyLine { line_no: number; hs_code: string; item_en?: string; value_paisa: number; duty_pct: number; duty_paisa: number; acd_pct: number; acd_paisa: number; rd_pct: number; rd_paisa: number; sales_tax_pct: number; sales_tax_paisa: number; wht_pct: number; wht_paisa: number; total_paisa: number }
 
 export function Wallet() {
   const { t } = useTranslation()
@@ -81,15 +82,19 @@ export function DutyScreen() {
     <Shell back={`/t/s/${id}`} title={t('trader.duty.title')}>
       {d.loading && !d.data ? <Loading /> : d.error ? <ErrorBox message={d.error} onRetry={d.reload} /> : d.data && (
         <>
-          <Notice tone="info" title={t('trader.duty.indicative')}>{d.data.fx_label}</Notice>
+          <Notice tone="info" title={t('trader.duty.indicative')}>{d.data.fx_label}<span className="mt-1 block text-sm text-muted">{t('trader.duty.basis')}</span></Notice>
           <ul>{d.data.lines.map((l) => (
             <li key={l.line_no} className="flex justify-between gap-4 border-b border-line py-3 text-sm">
               <span className="min-w-0">
                 <span className="block font-medium">{l.item_en || `#${l.line_no}`}</span>
                 <span className="block text-muted" dir="ltr">HS {l.hs_code} · {t('trader.duty.on', { value: paisa(l.value_paisa) })}</span>
-                <span className="block text-muted" dir="ltr">{t('trader.duty.split', { duty: paisa(l.duty_paisa), dp: l.duty_pct, tax: paisa(l.sales_tax_paisa), tp: l.sales_tax_pct })}</span>
+                <span className="mt-1 block text-muted">
+                  {([['cd', l.duty_paisa, l.duty_pct], ['acd', l.acd_paisa, l.acd_pct], ['rd', l.rd_paisa, l.rd_pct], ['st', l.sales_tax_paisa, l.sales_tax_pct], ['wht', l.wht_paisa, l.wht_pct]] as const)
+                    .filter(([, v]) => v > 0)
+                    .map(([k, v, p]) => <span key={k} className="block">{t(`trader.duty.c.${k}`)} <span dir="ltr" className="tabular-nums">{paisa(v)} ({p}%)</span></span>)}
+                </span>
               </span>
-              <span dir="ltr" className="shrink-0 font-semibold tabular-nums">{paisa(l.duty_paisa + l.sales_tax_paisa)}</span>
+              <span dir="ltr" className="shrink-0 font-semibold tabular-nums">{paisa(l.total_paisa)}</span>
             </li>
           ))}</ul>
           <div className="flex items-baseline justify-between py-4 text-lg font-semibold"><span>{t('trader.duty.total')}</span><span dir="ltr">{paisa(d.data.total_paisa)}</span></div>

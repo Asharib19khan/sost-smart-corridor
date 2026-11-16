@@ -182,11 +182,16 @@ def declaration(shipment_id: str, user: User = Depends(current_user), db: Sessio
             "unit": lines[x["line_no"]].unit if x["line_no"] in lines else None,
             "invoice_value_fen": x["value_fen"], "assessable_value_paisa": x["value_paisa"],
             "customs_duty_pct": x["duty_pct"], "customs_duty_paisa": x["duty_paisa"],
+            "additional_customs_duty_pct": x["acd_pct"], "additional_customs_duty_paisa": x["acd_paisa"],
+            "regulatory_duty_pct": x["rd_pct"], "regulatory_duty_paisa": x["rd_paisa"],
             "sales_tax_pct": x["sales_tax_pct"], "sales_tax_paisa": x["sales_tax_paisa"],
+            "advance_income_tax_pct": x["wht_pct"], "advance_income_tax_paisa": x["wht_paisa"],
         } for x in duty["lines"]],
         "assessable_value_paisa": sum(x["value_paisa"] for x in duty["lines"]),
         "total_duty_and_taxes_paisa": duty["total_paisa"],
-        "rates_note": "Indicative rates from the seeded tariff table, not the live PCT schedule.",
+        "rates_note": ("Indicative FY2026-27 structure: customs duty on the 0/5/10/15 slabs, additional customs duty 2% "
+                       "on the 15% slab, regulatory duty not set per item (0), sales tax 18%, advance income tax "
+                       "at import. Check each line against the current PCT schedule and SROs before filing."),
         "integrity": {
             "verified": chain["ok"] and not problems,
             "sealed_manifest_hash": (sealed or {}).get("manifest_hash"),

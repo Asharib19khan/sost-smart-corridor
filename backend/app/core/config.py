@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     ocr_timeout_s: int = 120
     # Demo FX rate CNY->PKR, labelled on screen as fixed sandbox rate.
     fx_cny_pkr: float = 39.0
+    # Advance income tax collected at import (Income Tax Ordinance s.148, commercial importer). Indicative.
+    import_wht_pct: float = 6.0
     dev_show_otp: bool = True
     # Showcase features: the admin Tamper lab (raw database edits) and the demo-account list on sign-in.
     # Turn off for any real deployment.

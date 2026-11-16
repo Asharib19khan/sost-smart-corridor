@@ -186,24 +186,49 @@ def create_payment(body: PaymentIn, request: Request, user: User = Depends(trade
     return {"payment_id": pay.id, "txn_id": txn.id, "event_seq": ev.seq, "state": s.state, "sandbox": True}
 
 
+# FY2026-27 tariff structure (National Tariff Policy 2025-30, second year): customs duty slabs 0/5/10/15
+# (old 20 -> 15, 16 -> 15, 11 -> 10, 3 -> 5); Additional Customs Duty 2% on the top slab, 0% below it;
+# Regulatory Duty capped at 20% but item-specific, so 0 here until set per HS code; sales tax 18% on value
+# plus all duties; advance income tax at import on the duty-paid value. INDICATIVE, labelled on screen.
+CD_FY27 = {20: 15, 16: 15, 11: 10, 3: 5}
+
+
+def _cd_pct(seed_pct: int) -> int:
+    return min(15, CD_FY27.get(seed_pct, seed_pct))
+
+
+def _pct(x: int, pct: float) -> int:
+    return int((x * round(pct * 100) + 5000) // 10000)  # half-up, pct may have a decimal
+
+
 def duty_breakdown(db: Session, s: Shipment) -> dict:
-    """Integer maths. Rate held in hundredths: value_paisa = total_fen × rate_x100 / 100 (half-up).
-    Duty = value × duty% ; sales tax = (value + duty) × st%. Each rounded half-up to the paisa."""
+    """Integer maths in paisa. value = total_fen × rate (half-up); CD, ACD, RD on value; sales tax on value
+    plus all duties; advance income tax on the duty-and-tax-paid value. Each rounded half-up to the paisa."""
     rate_x100 = round(settings.fx_cny_pkr * 100)
     lines_out, total = [], 0
     lines = db.scalars(select(ManifestLine).where(ManifestLine.shipment_id == s.id).order_by(ManifestLine.line_no))
     for ln in lines:
         band = db.get(ValueBand, ln.hs_code)
-        duty_pct = band.duty_pct if band else DEFAULT_DUTY_PCT
+        cd_pct = _cd_pct(band.duty_pct if band else DEFAULT_DUTY_PCT)
+        acd_pct = 2 if cd_pct >= 15 else 0
+        rd_pct = 0
         st_pct = band.sales_tax_pct if band else DEFAULT_ST_PCT
+        wht_pct = settings.import_wht_pct
         value = (ln.total_fen * rate_x100 + 50) // 100
-        duty = (value * duty_pct + 50) // 100
-        st = ((value + duty) * st_pct + 50) // 100
-        total += duty + st
+        cd, acd, rd = _pct(value, cd_pct), _pct(value, acd_pct), _pct(value, rd_pct)
+        st = _pct(value + cd + acd + rd, st_pct)
+        wht = _pct(value + cd + acd + rd + st, wht_pct)
+        line_total = cd + acd + rd + st + wht
+        total += line_total
         lines_out.append({
             "line_no": ln.line_no, "hs_code": ln.hs_code, "item_en": ln.item_en, "value_fen": ln.total_fen,
-            "value_paisa": value, "duty_pct": duty_pct, "duty_paisa": duty, "sales_tax_pct": st_pct,
-            "sales_tax_paisa": st,
+            "value_paisa": value,
+            "duty_pct": cd_pct, "duty_paisa": cd,
+            "acd_pct": acd_pct, "acd_paisa": acd,
+            "rd_pct": rd_pct, "rd_paisa": rd,
+            "sales_tax_pct": st_pct, "sales_tax_paisa": st,
+            "wht_pct": wht_pct, "wht_paisa": wht,
+            "total_paisa": line_total,
             "rate_label": f"Band rate for {band.description_en}" if band else "default rate, no band",
         })
     rate = f"{rate_x100 // 100}.{rate_x100 % 100:02d}"

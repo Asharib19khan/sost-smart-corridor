@@ -272,16 +272,17 @@ function DutyTable({ d }: { d: Duty }) {
   return (
     <div className="tbl-wrap">
       <table className="tbl">
-        <thead><tr><th>#</th><th>HS</th><th className="num">{t('customs.ship.value')}</th><th className="num">{t('customs.ship.dutyCol')}</th><th className="num">{t('customs.ship.salesTax')}</th></tr></thead>
+        <thead><tr><th>#</th><th>HS</th><th className="num">{t('customs.ship.value')}</th><th className="num">{t('customs.ship.dutyCol')}</th><th className="num">{t('customs.ship.salesTax')}</th><th className="num">{t('customs.ship.wht')}</th></tr></thead>
         <tbody>
           {d.lines.map((l) => (
             <tr key={l.line_no}>
               <td className="num">{l.line_no}</td><td className="mono">{l.hs_code}</td><td className="num">{paisa(l.value_paisa)}</td>
-              <td className="num">{paisa(l.duty_paisa)} <span className="text-xs text-muted">{l.duty_pct}%</span></td><td className="num">{paisa(l.sales_tax_paisa)}</td>
+              <td className="num">{paisa(l.duty_paisa + l.acd_paisa + l.rd_paisa)}<span className="block text-xs text-muted">CD {l.duty_pct}%{l.acd_pct ? ` · ACD ${l.acd_pct}%` : ''}{l.rd_pct ? ` · RD ${l.rd_pct}%` : ''}</span></td>
+              <td className="num">{paisa(l.sales_tax_paisa)}</td><td className="num">{paisa(l.wht_paisa)}</td>
             </tr>
           ))}
         </tbody>
-        <tfoot><tr><td colSpan={4} className="text-end text-xs text-muted">{t('customs.ship.dutyTotal')}</td><td className="num font-semibold">{paisa(d.total_paisa)}</td></tr></tfoot>
+        <tfoot><tr><td colSpan={5} className="text-end text-xs text-muted">{t('customs.ship.dutyTotal')}</td><td className="num font-semibold">{paisa(d.total_paisa)}</td></tr></tfoot>
       </table>
       <p className="px-2 py-1 text-xs text-muted">{t('customs.ship.fx', { rate: String(d.fx_cny_pkr) })}</p>
     </div>
