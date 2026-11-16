@@ -105,6 +105,11 @@ const CATS: Record<string, { ur: string; zh: string }> = {
   'oil/fuel filters for engines': { ur: 'انجن کے تیل / ایندھن فلٹر', zh: '发动机机油 / 燃油滤清器' },
   'hand tools': { ur: 'ہاتھ کے اوزار', zh: '手工工具' },
   'electric drills': { ur: 'بجلی کی ڈرل', zh: '电钻' },
+  'dried apricots': { ur: 'خشک خوبانی', zh: '杏干' },
+  'dried fruit': { ur: 'خشک میوہ', zh: '干果' },
+  'bags and cases': { ur: 'بیگ اور کیس', zh: '包袋及箱包' },
+  "babies' garments": { ur: 'بچوں کے کپڑے', zh: '婴儿服装' },
+  'sports footwear': { ur: 'کھیلوں کے جوتے', zh: '运动鞋' },
 }
 
 function cat(t: TFunction, name: string): string {

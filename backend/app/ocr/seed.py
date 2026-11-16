@@ -55,6 +55,15 @@ BANDS = [
     ("91021100", "Wrist watches, quartz", "pcs", 1000, 30000, 20, 18),
     ("73181500", "Bolts, screws, hardware fasteners", "kg", 800, 4000, 11, 18),
     ("83014000", "Locks and padlocks", "pcs", 500, 6000, 20, 18),
+    # HS 2022 codes. The receipt reader assigns these; the older entries above (8539.50, 9405.40, 0813.40,
+    # 6404.19) predate the 2022 split and stay only so existing shipments still resolve.
+    ("85395200", "LED lamps and bulbs", "pcs", 300, 5000, 11, 18),
+    ("94054200", "LED lights / light fittings", "pcs", 1500, 20000, 20, 18),
+    ("08131000", "Dried apricots", "kg", 2000, 12000, 20, 18),
+    ("08134090", "Dried fruit, other", "kg", 1500, 15000, 20, 18),
+    ("42029200", "Bags and cases, textile/plastic outer", "pcs", 2500, 30000, 20, 18),
+    ("61119000", "Babies' garments, knitted", "pcs", 800, 6000, 20, 18),
+    ("64041100", "Sports footwear, textile uppers", "pair", 3000, 25000, 20, 18),
 ]
 
 
