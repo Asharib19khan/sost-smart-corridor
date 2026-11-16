@@ -1,12 +1,11 @@
 # Starts the API (port 8000) and the web app (port 5173) for local demo use.
 # Usage:  .\dev.ps1            -> run both
-#         .\dev.ps1 -Seed      -> reset demo DB, seed, then run
+#         .\dev.ps1 -Seed      -> wipe the configured DB (SQLite or Supabase), seed, then run
 param([switch]$Seed)
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 if ($Seed) {
-  Remove-Item -Force -ErrorAction SilentlyContinue "$root\backend\data\sost.db*"
-  Push-Location "$root\backend"; uv run python -m app.seed; Pop-Location
+  Push-Location "$root\backend"; uv run python scripts/reset_db.py --yes; Pop-Location
 }
 
 $env:WATCHFILES_FORCE_POLLING = "true"   # Y: drive does not emit file events

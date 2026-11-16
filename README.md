@@ -334,6 +334,9 @@ no policies, so Supabase's public API key can read nothing. The same end-to-end 
 `SOST_E2E_DATABASE_URL=<that url> uv run pytest tests/test_e2e.py`. Over the internet each action is about a second
 slower than local SQLite. Use the *session pooler*, not the direct host (direct is IPv6-only).
 
+To wipe Supabase back to fresh demo data (deletes everything in it): `.\dev.ps1 -Seed`, or
+`cd backend; uv run python scripts/reset_db.py --yes`. Without `--yes` it only prints which database it would wipe.
+
 ### Check it
 
 ```powershell
