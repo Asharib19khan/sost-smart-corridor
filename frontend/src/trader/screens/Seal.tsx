@@ -22,7 +22,8 @@ export default function Seal() {
   const [png, setPng] = useState<string | null>(null)
   const seal = ship.data?.seal ?? null
   // VITE_PUBLIC_ORIGIN lets a laptop on localhost still print QR codes that visitors' phones can open.
-  const origin = (import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined)?.replace(/\/$/, '') || location.origin
+  const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+  const origin = (local && (import.meta.env.VITE_PUBLIC_ORIGIN as string | undefined)?.replace(/\/$/, '')) || location.origin
   const url = seal ? `${origin}/v/${id}#${seal}` : null
 
   useEffect(() => { if (url) void QRCode.toDataURL(url, { margin: 1, width: 300, errorCorrectionLevel: 'M' }).then(setPng) }, [url])
