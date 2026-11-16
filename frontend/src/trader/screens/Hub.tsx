@@ -53,7 +53,7 @@ export default function Hub() {
             {(['scan', 'review', 'pay', 'seal', 'track'] as const).map((k) => (
               <Link key={k} to={k} className="flex min-h-12 items-center border-b border-line">{t(`trader.hub.link.${k}`)}</Link>
             ))}
-            <Link to="/t/wallet" className="flex min-h-12 items-center border-b border-line">{t('trader.hub.link.duty')}</Link>
+            <Link to="duty" className="flex min-h-12 items-center border-b border-line">{t('trader.hub.link.duty')}</Link>
           </nav>
         </>
       )}

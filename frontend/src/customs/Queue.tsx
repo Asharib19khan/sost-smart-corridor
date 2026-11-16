@@ -25,7 +25,7 @@ export default function Queue() {
     if (q.data) setLastAt(new Date())
   }, [q.data])
 
-  const rows = useMemo(() => (q.data ?? []).toSorted((a, b) => b.risk.score - a.risk.score), [q.data])
+  const rows = useMemo(() => [...(q.data ?? [])].sort((a, b) => b.risk.score - a.risk.score), [q.data])
 
   return (
     <>

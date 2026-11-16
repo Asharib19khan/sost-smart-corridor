@@ -1,6 +1,68 @@
-// Strings for the trader area. Keys namespaced "trader.*". Keep ur/en/zh in sync.
-export const traderLocales = {
-  en: { trader: {} },
-  ur: { trader: {} },
-  zh: { trader: {} },
+// Strings for the trader area. Keys namespaced "trader.*". ur/en/zh kept in sync (typed against en).
+const en = {
+  back: 'Back', risk: 'Risk',
+  home: { hello: 'Welcome', new: 'Start a new shipment', mine: 'My shipments', assigned: 'Assigned shipments', empty: 'No shipments yet. Start one when you have a receipt from Kashgar.', emptyDriver: 'No shipments assigned to you yet.', wallet: 'Wallet', logout: 'Sign out' },
+  hub: {
+    title: 'Shipment', next: 'Next step',
+    do: { scan: 'Scan a receipt', review: 'Check the items', pay: 'Pay the seller', seal: 'Seal the shipment', track: 'Record a checkpoint' },
+    end: { cleared: 'Cleared by customs. Nothing more to do.', held: 'Customs is holding this shipment. Check the reason with the officer.', arrived_sost: 'At Sost. Waiting for customs.', other: 'No further step for you right now.' },
+    receipts: 'Receipts', lines: 'Items', total: 'Total',
+    link: { scan: 'Scan', review: 'Items', pay: 'Pay', seal: 'Seal', track: 'Track', duty: 'Duty' },
+  },
+  key: { failed: 'This phone could not be registered for signing.', again: 'Register this phone again' },
+  login: { title: 'Sign in', phone: 'Phone number', pin: 'Enter your PIN', signIn: 'Sign in', demo: 'Demo accounts', demoNote: 'Demo data. Tap one to fill the phone and PIN, then press Sign in.' },
+  signup: { title: 'Create account', intro: 'Verify your phone, then choose a PIN. Your ID number is stored only as a one-way hash.', sendCode: 'Send code', devTitle: 'Dev code shown because SMS is not connected', devCode: 'Your code:', code: 'Code', name: 'Full name', cnic: 'CNIC number', cnicHint: 'Used once to stop duplicate accounts. Never stored in readable form.', pin: 'Choose a 4-digit PIN', create: 'Create account', cta: 'New here? Create an account', haveAccount: 'I already have an account' },
+  scan: { title: 'Scan a receipt', intro: 'Photograph the Kashgar receipt flat, in good light. We read it, translate it and suggest HS codes. You check everything next.', seller: 'Seller', sellerNone: 'Choose the shop', pick: 'Tap to take or choose a photo', formats: 'JPEG, PNG, WebP or HEIC, up to 8 MB', upload: 'Read this receipt', reading: 'Reading the receipt…', readingNote: 'This takes about 15 seconds. Keep this page open.', failed: 'We could not read this photo. Try a flatter, brighter photo.', done: 'Read {{n}} items, total {{total}}.', onFile: 'Receipts on file', none: 'No receipts yet.', receiptN: 'Receipt {{n}}', next: 'Check the items' },
+  flag: { injection_text: 'The receipt contains text that looks like instructions. It was ignored; check the items carefully.', total_mismatch: 'Line totals do not add up to the receipt total.' },
+  review: { title: 'Check the items', intro: 'Fix anything that looks wrong. Each edit is recorded.', empty: 'No items yet. Scan a receipt first.', confidence: 'HS match {{pct}}%', lowConf: 'Low confidence — please check the HS code.', valueFlag: 'Price looks unusual for this item', edit: 'Edit', save: 'Save', cancel: 'Cancel', qty: 'Qty', price: 'Unit price ¥', badNumber: 'Enter a whole quantity and a price like 12.50.', next: 'Continue to payment' },
+  pay: { title: 'Pay the seller', sandbox: 'Sandbox money', sandboxNote: 'Demo wallet. These are not real yuan or rupees.', balance: 'Yuan balance', pin: 'Enter your PIN to pay', none: 'Nothing to pay yet. Scan and check a receipt first.', paid: '✓ Paid', noSeller: 'Choose a seller on the scan screen first.', send: 'Pay {{amount}}', topup: 'Add sandbox yuan in your wallet', ok: 'Payment sent and signed.', next: 'Seal the shipment', dutyNote: 'Duty is paid in rupees at Sost. Rupee balance: {{amount}}.' },
+  seal: { title: 'Seal the shipment', hash: 'Manifest fingerprint', intro: 'Sealing signs this exact list with your phone key. Any later change to any line will be detected.', cta: 'Seal with my key', done: 'Sealed', doneNote: 'Show this code at Sost. Anyone can check it, even without signal.', qrAlt: 'Seal QR code', notReady: 'Not ready to seal', notReadyNote: 'Pay the seller first.' },
+  track: { title: 'Checkpoints', intro: 'Tap at each checkpoint. Your phone adds its real GPS location and signs it.', at: { kashgar: 'Left Kashgar', khunjerab: 'Crossed Khunjerab', sost: 'Arrived at Sost' }, noGps: 'Could not get your location. Allow location access, or tick the demo location.', sent: 'Checkpoint recorded.', queued: 'No signal. Saved on this phone and will be sent when you are online.', demoLoc: 'Use demo location (for presentations only)', demoNote: 'Demo location: coordinates are not from your GPS.', waiting: '{{n}} checkpoint(s) waiting to send', sendNow: 'Send now', discard: 'Discard first', log: 'Checkpoint log', none: 'No checkpoints yet.', outside: 'Outside the expected area — customs will see this.' },
+  wallet: { title: 'Wallet', credit: 'Credit limit', addCny: 'Add ¥50,000 (sandbox)', addPkr: 'Add Rs 500,000 (sandbox)', trust: 'Trust score {{score}}', history: 'History', none: 'No transactions yet.' },
+  duty: { title: 'Duty and tax', indicative: 'Indicative estimate', total: 'Total payable', pay: 'Pay duty (sandbox)', paid: 'Duty paid.' },
 }
+const ur: typeof en = {
+  back: 'واپس', risk: 'خطرہ',
+  home: { hello: 'خوش آمدید', new: 'نئی کھیپ شروع کریں', mine: 'میری کھیپیں', assigned: 'آپ کو سونپی گئی کھیپیں', empty: 'ابھی کوئی کھیپ نہیں۔ کاشغر کی رسید ہو تو شروع کریں۔', emptyDriver: 'ابھی آپ کو کوئی کھیپ نہیں سونپی گئی۔', wallet: 'والیٹ', logout: 'سائن آؤٹ' },
+  hub: {
+    title: 'کھیپ', next: 'اگلا قدم',
+    do: { scan: 'رسید اسکین کریں', review: 'اشیاء چیک کریں', pay: 'بیچنے والے کو ادائیگی کریں', seal: 'کھیپ پر مہر لگائیں', track: 'چیک پوائنٹ درج کریں' },
+    end: { cleared: 'کسٹمز نے کلیئر کر دیا۔ مزید کچھ نہیں کرنا۔', held: 'کسٹمز نے کھیپ روک رکھی ہے۔ وجہ افسر سے پوچھیں۔', arrived_sost: 'سوست میں ہے۔ کسٹمز کا انتظار ہے۔', other: 'ابھی آپ کے لیے کوئی اگلا قدم نہیں۔' },
+    receipts: 'رسیدیں', lines: 'اشیاء', total: 'کل',
+    link: { scan: 'اسکین', review: 'اشیاء', pay: 'ادائیگی', seal: 'مہر', track: 'ٹریک', duty: 'ڈیوٹی' },
+  },
+  key: { failed: 'اس فون کو دستخط کے لیے رجسٹر نہیں کیا جا سکا۔', again: 'اس فون کو دوبارہ رجسٹر کریں' },
+  login: { title: 'سائن اِن', phone: 'فون نمبر', pin: 'اپنا پن درج کریں', signIn: 'سائن اِن', demo: 'ڈیمو اکاؤنٹس', demoNote: 'ڈیمو ڈیٹا۔ ایک پر ٹیپ کریں، فون اور پن بھر جائیں گے، پھر سائن اِن دبائیں۔' },
+  signup: { title: 'اکاؤنٹ بنائیں', intro: 'اپنا فون تصدیق کریں، پھر پن چنیں۔ شناختی نمبر صرف یک طرفہ ہیش کی صورت میں محفوظ ہوتا ہے۔', sendCode: 'کوڈ بھیجیں', devTitle: 'ڈیولپمنٹ کوڈ دکھایا گیا کیونکہ ایس ایم ایس منسلک نہیں', devCode: 'آپ کا کوڈ:', code: 'کوڈ', name: 'پورا نام', cnic: 'شناختی کارڈ نمبر', cnicHint: 'ایک بار صرف نقلی اکاؤنٹ روکنے کے لیے۔ پڑھنے کے قابل شکل میں محفوظ نہیں ہوتا۔', pin: '4 ہندسوں کا پن چنیں', create: 'اکاؤنٹ بنائیں', cta: 'نئے ہیں؟ اکاؤنٹ بنائیں', haveAccount: 'میرا اکاؤنٹ پہلے سے ہے' },
+  scan: { title: 'رسید اسکین کریں', intro: 'کاشغر کی رسید کی تصویر سیدھی اور اچھی روشنی میں لیں۔ ہم اسے پڑھ کر ترجمہ کریں گے اور ایچ ایس کوڈ تجویز کریں گے۔ اگلے مرحلے میں آپ سب چیک کریں گے۔', seller: 'بیچنے والا', sellerNone: 'دکان چنیں', pick: 'تصویر لینے یا چننے کے لیے ٹیپ کریں', formats: 'JPEG، PNG، WebP یا HEIC، زیادہ سے زیادہ 8 MB', upload: 'یہ رسید پڑھیں', reading: 'رسید پڑھی جا رہی ہے…', readingNote: 'تقریباً 15 سیکنڈ لگتے ہیں۔ یہ صفحہ کھلا رکھیں۔', failed: 'یہ تصویر پڑھی نہیں جا سکی۔ زیادہ سیدھی اور روشن تصویر لیں۔', done: '{{n}} اشیاء پڑھی گئیں، کل {{total}}۔', onFile: 'محفوظ رسیدیں', none: 'ابھی کوئی رسید نہیں۔', receiptN: 'رسید {{n}}', next: 'اشیاء چیک کریں' },
+  flag: { injection_text: 'رسید میں ہدایات جیسا متن تھا۔ اسے نظر انداز کر دیا گیا؛ اشیاء احتیاط سے چیک کریں۔', total_mismatch: 'لائنوں کا مجموعہ رسید کے کل سے نہیں ملتا۔' },
+  review: { title: 'اشیاء چیک کریں', intro: 'جو غلط لگے اسے درست کریں۔ ہر تبدیلی درج ہوتی ہے۔', empty: 'ابھی کوئی چیز نہیں۔ پہلے رسید اسکین کریں۔', confidence: 'ایچ ایس مطابقت {{pct}}٪', lowConf: 'اعتماد کم ہے — ایچ ایس کوڈ چیک کریں۔', valueFlag: 'اس چیز کی قیمت غیر معمولی لگتی ہے', edit: 'ترمیم', save: 'محفوظ کریں', cancel: 'منسوخ', qty: 'تعداد', price: 'فی اکائی قیمت ¥', badNumber: 'پوری تعداد اور 12.50 جیسی قیمت لکھیں۔', next: 'ادائیگی کی طرف' },
+  pay: { title: 'بیچنے والے کو ادائیگی', sandbox: 'سینڈ باکس رقم', sandboxNote: 'ڈیمو والیٹ۔ یہ اصل یوآن یا روپے نہیں ہیں۔', balance: 'یوآن بیلنس', pin: 'ادائیگی کے لیے پن درج کریں', none: 'ابھی ادائیگی کے لیے کچھ نہیں۔ پہلے رسید اسکین اور چیک کریں۔', paid: '✓ ادا ہو گیا', noSeller: 'پہلے اسکین اسکرین پر بیچنے والا چنیں۔', send: '{{amount}} ادا کریں', topup: 'والیٹ میں سینڈ باکس یوآن ڈالیں', ok: 'ادائیگی بھیج دی گئی اور دستخط ہو گئے۔', next: 'کھیپ پر مہر لگائیں', dutyNote: 'ڈیوٹی سوست میں روپوں میں ادا ہوتی ہے۔ روپے کا بیلنس: {{amount}}۔' },
+  seal: { title: 'کھیپ پر مہر', hash: 'مینی فیسٹ کا فنگر پرنٹ', intro: 'مہر لگانے سے یہی فہرست آپ کے فون کی کلید سے دستخط ہو جاتی ہے۔ بعد میں کسی بھی لائن کی تبدیلی پکڑی جائے گی۔', cta: 'اپنی کلید سے مہر لگائیں', done: 'مہر بند', doneNote: 'یہ کوڈ سوست میں دکھائیں۔ کوئی بھی اسے جانچ سکتا ہے، سگنل کے بغیر بھی۔', qrAlt: 'مہر کا کیو آر کوڈ', notReady: 'مہر کے لیے تیار نہیں', notReadyNote: 'پہلے بیچنے والے کو ادائیگی کریں۔' },
+  track: { title: 'چیک پوائنٹ', intro: 'ہر چیک پوائنٹ پر ٹیپ کریں۔ آپ کا فون اصل جی پی ایس مقام شامل کر کے دستخط کرتا ہے۔', at: { kashgar: 'کاشغر سے روانہ', khunjerab: 'خنجراب پار', sost: 'سوست پہنچ گئے' }, noGps: 'آپ کا مقام نہیں مل سکا۔ مقام کی اجازت دیں یا ڈیمو مقام منتخب کریں۔', sent: 'چیک پوائنٹ درج ہو گیا۔', queued: 'سگنل نہیں۔ اس فون میں محفوظ ہے اور آن لائن ہوتے ہی بھیج دیا جائے گا۔', demoLoc: 'ڈیمو مقام استعمال کریں (صرف پیشکش کے لیے)', demoNote: 'ڈیمو مقام: یہ نقاط آپ کے جی پی ایس کے نہیں۔', waiting: '{{n}} چیک پوائنٹ بھیجنے کے منتظر', sendNow: 'ابھی بھیجیں', discard: 'پہلا حذف کریں', log: 'چیک پوائنٹ لاگ', none: 'ابھی کوئی چیک پوائنٹ نہیں۔', outside: 'متوقع علاقے سے باہر — کسٹمز کو یہ نظر آئے گا۔' },
+  wallet: { title: 'والیٹ', credit: 'کریڈٹ کی حد', addCny: '¥50,000 ڈالیں (سینڈ باکس)', addPkr: 'Rs 500,000 ڈالیں (سینڈ باکس)', trust: 'اعتماد اسکور {{score}}', history: 'تاریخ', none: 'ابھی کوئی لین دین نہیں۔' },
+  duty: { title: 'ڈیوٹی اور ٹیکس', indicative: 'اندازاً تخمینہ', total: 'کل واجب الادا', pay: 'ڈیوٹی ادا کریں (سینڈ باکس)', paid: 'ڈیوٹی ادا ہو گئی۔' },
+}
+const zh: typeof en = {
+  back: '返回', risk: '风险',
+  home: { hello: '欢迎', new: '开始新货运', mine: '我的货运', assigned: '分配给我的货运', empty: '还没有货运。拿到喀什的收据后开始。', emptyDriver: '还没有分配给你的货运。', wallet: '钱包', logout: '退出' },
+  hub: {
+    title: '货运', next: '下一步',
+    do: { scan: '扫描收据', review: '核对货品', pay: '向卖家付款', seal: '封签货运', track: '记录检查点' },
+    end: { cleared: '海关已放行，无需操作。', held: '海关扣留了此货运，请向官员询问原因。', arrived_sost: '已到苏斯特，等待海关。', other: '目前你没有后续步骤。' },
+    receipts: '收据', lines: '货品', total: '合计',
+    link: { scan: '扫描', review: '货品', pay: '付款', seal: '封签', track: '跟踪', duty: '关税' },
+  },
+  key: { failed: '此手机无法注册签名密钥。', again: '重新注册此手机' },
+  login: { title: '登录', phone: '手机号码', pin: '输入你的 PIN', signIn: '登录', demo: '演示账号', demoNote: '演示数据。点选一个即可填入手机号和 PIN，然后按登录。' },
+  signup: { title: '创建账号', intro: '验证手机后设置 PIN。身份证号仅以单向哈希保存。', sendCode: '发送验证码', devTitle: '因未接入短信，这里显示开发验证码', devCode: '你的验证码：', code: '验证码', name: '姓名', cnic: '身份证号（CNIC）', cnicHint: '仅用于防止重复账号一次，不会以可读形式保存。', pin: '设置 4 位 PIN', create: '创建账号', cta: '新用户？创建账号', haveAccount: '我已有账号' },
+  scan: { title: '扫描收据', intro: '在良好光线下平拍喀什收据。我们会识别、翻译并建议 HS 编码，下一步由你核对。', seller: '卖家', sellerNone: '选择店铺', pick: '点按拍照或选择照片', formats: 'JPEG、PNG、WebP 或 HEIC，最大 8 MB', upload: '识别此收据', reading: '正在识别收据…', readingNote: '大约需要 15 秒，请保持此页面打开。', failed: '无法识别这张照片，请拍得更平整、更明亮。', done: '识别了 {{n}} 项，合计 {{total}}。', onFile: '已有收据', none: '还没有收据。', receiptN: '收据 {{n}}', next: '核对货品' },
+  flag: { injection_text: '收据中含有类似指令的文字，已被忽略；请仔细核对货品。', total_mismatch: '各行合计与收据总额不符。' },
+  review: { title: '核对货品', intro: '有错就改，每次修改都会被记录。', empty: '还没有货品，请先扫描收据。', confidence: 'HS 匹配度 {{pct}}%', lowConf: '置信度低——请核对 HS 编码。', valueFlag: '该货品价格不寻常', edit: '编辑', save: '保存', cancel: '取消', qty: '数量', price: '单价 ¥', badNumber: '请输入整数数量和类似 12.50 的价格。', next: '继续付款' },
+  pay: { title: '向卖家付款', sandbox: '沙盒资金', sandboxNote: '演示钱包，不是真实人民币或卢比。', balance: '人民币余额', pin: '输入 PIN 以付款', none: '暂无可付款项。请先扫描并核对收据。', paid: '✓ 已付款', noSeller: '请先在扫描页选择卖家。', send: '支付 {{amount}}', topup: '到钱包充值沙盒人民币', ok: '付款已发送并签名。', next: '封签货运', dutyNote: '关税在苏斯特以卢比缴纳。卢比余额：{{amount}}。' },
+  seal: { title: '封签货运', hash: '货单指纹', intro: '封签会用你手机的密钥为这份清单签名。之后任何一行被改动都会被发现。', cta: '用我的密钥封签', done: '已封签', doneNote: '在苏斯特出示此码。任何人都能验证，无信号也可以。', qrAlt: '封签二维码', notReady: '尚不能封签', notReadyNote: '请先向卖家付款。' },
+  track: { title: '检查点', intro: '在每个检查点点按。手机会加上真实 GPS 位置并签名。', at: { kashgar: '已离开喀什', khunjerab: '已过红其拉甫', sost: '已到苏斯特' }, noGps: '无法获取位置。请允许定位，或勾选演示位置。', sent: '检查点已记录。', queued: '没有信号。已保存在手机，联网后自动发送。', demoLoc: '使用演示位置（仅用于演示）', demoNote: '演示位置：这些坐标不是你的 GPS。', waiting: '{{n}} 个检查点等待发送', sendNow: '立即发送', discard: '丢弃第一条', log: '检查点记录', none: '还没有检查点。', outside: '不在预期区域内——海关将看到此标记。' },
+  wallet: { title: '钱包', credit: '信用额度', addCny: '充值 ¥50,000（沙盒）', addPkr: '充值 Rs 500,000（沙盒）', trust: '信任分 {{score}}', history: '记录', none: '暂无交易。' },
+  duty: { title: '关税与税费', indicative: '参考估算', total: '应缴合计', pay: '缴纳关税（沙盒）', paid: '关税已缴。' },
+}
+export const traderLocales = { en: { trader: en }, ur: { trader: ur }, zh: { trader: zh } }
