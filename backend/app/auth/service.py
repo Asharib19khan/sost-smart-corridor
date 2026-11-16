@@ -43,7 +43,16 @@ def check_secret(value: str, hashed: str | None) -> bool:
 
 
 def normalise_phone(phone: str) -> str:
-    p = re.sub(r"[\s-]", "", phone or "")
+    p = re.sub(r"[\s().-]", "", phone or "")
+    # Accept the ways people really type a Pakistani mobile: +92300…, 92300…, 0092300…, 0300…, 300…
+    if p.startswith("0092"):
+        p = "+" + p[2:]
+    elif re.fullmatch(r"92\d{10}", p):
+        p = "+" + p
+    elif re.fullmatch(r"0\d{10}", p):
+        p = "+92" + p[1:]
+    elif re.fullmatch(r"3\d{9}", p):
+        p = "+92" + p
     if not PHONE_RE.match(p):
         raise HTTPException(400, "Phone number looks wrong. Use the format +923001234567.")
     return p
