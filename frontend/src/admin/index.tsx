@@ -1,6 +1,6 @@
 // Admin: tamper lab (the live "an attacker edits the database" demo), audit log, users and keys.
 import './../customs/lib/tool.css'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '../shared/api'
 import { Guard, ToolShell } from '../customs/lib/ui'
@@ -28,11 +28,19 @@ function TamperLab() {
   const [err, setErr] = useState<string | null>(null)
   const [report, setReport] = useState<VerifyReport | null>(null)
   const [busy, setBusy] = useState(false)
+  const [checking, setChecking] = useState(false)
   const needs = ACTIONS.find((a) => a.id === action)!.needs
 
+  // Only the newest check may set the report: a slow earlier check must not overwrite a fresh one.
+  const checkNo = useRef(0)
   const check = async (id = sid) => {
     if (!id) return
-    setReport(await api<VerifyReport>(`/verify/${id}`, { auth: false }))
+    const n = ++checkNo.current
+    setReport(null); setChecking(true)
+    try {
+      const r = await api<VerifyReport>(`/verify/${id}`, { auth: false })
+      if (n === checkNo.current) setReport(r)
+    } finally { if (n === checkNo.current) setChecking(false) }
   }
   const run = async (fn: () => Promise<unknown>, okMsg: string) => {
     setBusy(true); setErr(null); setMsg(null)
@@ -64,10 +72,11 @@ function TamperLab() {
         {needs.includes('value') && <label>{t('admin.tamper.value')}<br /><input className="field w-28" value={value} onChange={(e) => setValue(e.target.value)} /></label>}
         <button className="btn btn-bad" disabled={!sid || busy} onClick={() => void attack()}>{t('admin.tamper.run')}</button>
         <button className="btn" disabled={!sid || busy} onClick={() => void restore()}>{t('admin.tamper.restore')}</button>
-        <button className="btn" disabled={!sid} onClick={() => void check()}>{t('admin.tamper.verify')}</button>
+        <button className="btn" disabled={!sid || busy} onClick={() => void check()}>{t('admin.tamper.verify')}</button>
       </div>
       {err && <p role="alert" className="mt-3 text-sm text-bad">{err}</p>}
       {msg && <p role="status" className="mt-3 text-sm text-muted">{msg}</p>}
+      {checking && <p className="mt-3 text-sm text-muted" role="status">{t('admin.tamper.checking')}</p>}
       {report && (
         <div data-testid="tamper-result" className={`mt-3 rounded border px-3 py-2 text-sm font-semibold ${report.overall.ok ? 'border-ok bg-ok-soft text-ok' : 'border-bad bg-bad-soft text-bad'}`}>
           {report.overall.message}
