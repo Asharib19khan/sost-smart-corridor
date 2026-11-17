@@ -26,6 +26,10 @@ function initialLang(): Lang {
     const saved = localStorage.getItem('sost.lang')
     if (saved === 'ur' || saved === 'en' || saved === 'zh') return saved
   } catch { /* ignore */ }
+  // A Kashgar shop opening its link for the first time reads Mandarin. Decided here, before the first paint, so the
+  // page never flashes English, and not saved, so it never overrides anyone's own choice. Someone who navigates to
+  // the seller page from inside the app keeps the language they are already using.
+  if (typeof location !== 'undefined' && location.pathname.startsWith('/s/')) return 'zh'
   return 'en'
 }
 

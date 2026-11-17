@@ -1,5 +1,5 @@
 // Seller page: /s/:token. No login. The shop checks the goods list and counter-signs with a key kept on this phone.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Route, Routes, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { api } from '../shared/api'
@@ -26,18 +26,6 @@ function SellerPage() {
   const waiting = link.data?.pending.filter((p) => !p.confirmed && p.amount_fen > 0) ?? []
   const earlier = link.data?.pending.filter((p) => p.confirmed) ?? []
 
-  // The shop speaks Mandarin first; keep their own choice if they made one.
-  useEffect(() => {
-    let temp = false
-    try { temp = !localStorage.getItem('sost.lang') } catch { /* ignore */ }
-    if (temp) void i18n.changeLanguage('zh')
-    // Default only: leaving the page forgets it, so it never overrides another user's choice on a shared browser.
-    return () => {
-      if (!temp) return
-      void i18n.changeLanguage('en').then(() => { try { localStorage.removeItem('sost.lang') } catch { /* ignore */ } })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const confirm = async (p: Pending) => {
     setBusy(p.shipment_id); setErr(null); setDone(null); setErrFor(p.shipment_id)
@@ -65,7 +53,7 @@ function SellerPage() {
   }
 
   return (
-    <Shell title={link.data ? <span lang="zh">{link.data.seller.shop_name_zh}</span> : t('seller.title')}>
+    <Shell title={link.data ? <ShopName s={link.data.seller} zhFirst={i18n.language === 'zh'} /> : t('seller.title')}>
       {link.loading && !link.data ? <Loading /> : link.error ? <ErrorBox message={link.error} onRetry={link.reload} /> : link.data && (
         <>
           {waiting.length > 0 && <p className="mb-6 text-muted">{t('seller.intro')}</p>}
@@ -110,4 +98,16 @@ function SellerPage() {
 
 export default function SellerApp() {
   return <Routes><Route path=":token" element={<SellerPage />} /><Route path="*" element={<p className="p-6">404</p>} /></Routes>
+}
+
+/** The shop's name in the page's language, with the other script underneath. */
+function ShopName({ s, zhFirst }: { s: { shop_name_zh: string; shop_name_en: string }; zhFirst: boolean }) {
+  const zh = <span lang="zh">{s.shop_name_zh}</span>
+  const en = <span lang="en" dir="ltr">{s.shop_name_en}</span>
+  return (
+    <>
+      {zhFirst ? zh : en}
+      <span className="mt-1 block text-base font-normal tracking-normal text-muted">{zhFirst ? en : zh}</span>
+    </>
+  )
 }
